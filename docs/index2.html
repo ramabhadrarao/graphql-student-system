@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL Practice - Interactive Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #667eea;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 15px 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: #e9ecef;
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .test-card {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .test-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .test-card p {
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .query-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            resize: vertical;
+            background: #2d2d2d;
+            color: #f8f8f2;
+        }
+
+        .variables-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            resize: vertical;
+            background: #2d2d2d;
+            color: #f8f8f2;
+        }
+
+        .btn-execute {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-execute:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-clear {
+            background: #6c757d;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .btn-clear:hover {
+            background: #5a6268;
+        }
+
+        .btn-copy {
+            background: #17a2b8;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .btn-copy:hover {
+            background: #138496;
+        }
+
+        .output-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 15px;
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 5px solid #0c5460;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #0c5460;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #856404;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #856404;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-query {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-mutation {
+            background: #007bff;
+            color: white;
+        }
+
+        .badge-variables {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .quick-actions {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .quick-actions h4 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .quick-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: #764ba2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .endpoint-info {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                text-align: left;
+            }
+
+            .content {
+                padding: 15px;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.8em;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎯 Interactive GraphQL Practice</h1>
+            <p>Click and Test - Student Management System</p>
+            <div class="endpoint-info">
+                Endpoint: http://localhost:4000/graphql
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="content">
+            <div class="stats-grid" id="stats">
+                <div class="stat-card">
+                    <h3 id="totalTests">0</h3>
+                    <p>Tests Executed</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="successTests">0</h3>
+                    <p>Successful</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="failedTests">0</h3>
+                    <p>Failed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('departments')">🏢 Departments</button>
+            <button class="tab-btn" onclick="showTab('students')">👨‍🎓 Students</button>
+            <button class="tab-btn" onclick="showTab('queries')">🔍 Advanced Queries</button>
+            <button class="tab-btn" onclick="showTab('updates')">✏️ Updates</button>
+            <button class="tab-btn" onclick="showTab('deletes')">🗑️ Deletes</button>
+            <button class="tab-btn" onclick="showTab('variables')">🔧 With Variables</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- Departments Tab -->
+            <div id="departments" class="tab-content active">
+                <h2 class="section-title">🏢 Department Operations</h2>
+
+                <!-- Create BCA Department -->
+                <div class="test-card">
+                    <h3>1. Create BCA Department <span class="badge badge-mutation">MUTATION</span></h3>
+                    <p>Create a new Computer Applications department</p>
+                    <textarea class="query-input" id="dept1">mutation {
+  addDepartment(
+    name: "Computer Applications"
+    code: "BCA"
+    hod: "Dr. Rama Krishna"
+    building: "Block A"
+  ) {
+    id
+    name
+    code
+    hod
+    building
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('dept1', 'output1')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('dept1')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output1')">🗑️ Clear</button>
+                    <div class="output-box" id="output1">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Create CSE Department -->
+                <div class="test-card">
+                    <h3>2. Create CSE Department <span class="badge badge-mutation">MUTATION</span></h3>
+                    <p>Create a new Computer Science Engineering department</p>
+                    <textarea class="query-input" id="dept2">mutation {
+  addDepartment(
+    name: "Computer Science Engineering"
+    code: "CSE"
+    hod: "Dr. Sharma"
+    building: "Block B"
+  ) {
+    id
+    name
+    code
+    hod
+    building
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('dept2', 'output2')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('dept2')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output2')">🗑️ Clear</button>
+                    <div class="output-box" id="output2">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Create ECE Department -->
+                <div class="test-card">
+                    <h3>3. Create ECE Department <span class="badge badge-mutation">MUTATION</span></h3>
+                    <p>Create a new Electronics Engineering department</p>
+                    <textarea class="query-input" id="dept3">mutation {
+  addDepartment(
+    name: "Electronics Engineering"
+    code: "ECE"
+    hod: "Dr. Kumar"
+    building: "Block C"
+  ) {
+    id
+    name
+    code
+    hod
+    building
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('dept3', 'output3')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('dept3')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output3')">🗑️ Clear</button>
+                    <div class="output-box" id="output3">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Get All Departments -->
+                <div class="test-card">
+                    <h3>4. Get All Departments <span class="badge badge-query">QUERY</span></h3>
+                    <p>Retrieve all departments from the database</p>
+                    <textarea class="query-input" id="dept4">query {
+  departments {
+    id
+    name
+    code
+    hod
+    building
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('dept4', 'output4')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('dept4')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output4')">🗑️ Clear</button>
+                    <div class="output-box" id="output4">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Get Single Department -->
+                <div class="test-card">
+                    <h3>5. Get Single Department <span class="badge badge-query">QUERY</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_DEPARTMENT_ID with actual ID from above results
+                    </div>
+                    <textarea class="query-input" id="dept5">query {
+  department(id: "YOUR_DEPARTMENT_ID") {
+    id
+    name
+    code
+    hod
+    building
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('dept5', 'output5')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('dept5')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output5')">🗑️ Clear</button>
+                    <div class="output-box" id="output5">Click "Execute" to run the query...</div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="students" class="tab-content">
+                <h2 class="section-title">👨‍🎓 Student Operations</h2>
+
+                <div class="info-box">
+                    📝 Note: You need to create departments first and use their IDs here
+                </div>
+
+                <!-- Create Student 1 -->
+                <div class="test-card">
+                    <h3>1. Create Student - Ravi Kumar <span class="badge badge-mutation">MUTATION</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_DEPARTMENT_ID with BCA department ID
+                    </div>
+                    <textarea class="query-input" id="student1">mutation {
+  addStudent(
+    name: "Ravi Kumar"
+    email: "ravi@example.com"
+    rollNumber: "BCA001"
+    age: 20
+    phone: "9876543210"
+    departmentId: "YOUR_DEPARTMENT_ID"
+  ) {
+    id
+    name
+    email
+    rollNumber
+    age
+    phone
+    department {
+      name
+      code
+    }
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('student1', 'output6')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('student1')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output6')">🗑️ Clear</button>
+                    <div class="output-box" id="output6">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Create Student 2 -->
+                <div class="test-card">
+                    <h3>2. Create Student - Priya Sharma <span class="badge badge-mutation">MUTATION</span></h3>
+                    <textarea class="query-input" id="student2">mutation {
+  addStudent(
+    name: "Priya Sharma"
+    email: "priya@example.com"
+    rollNumber: "BCA002"
+    age: 19
+    phone: "9876543211"
+    departmentId: "YOUR_DEPARTMENT_ID"
+  ) {
+    id
+    name
+    email
+    rollNumber
+    age
+    department {
+      name
+    }
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('student2', 'output7')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('student2')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output7')">🗑️ Clear</button>
+                    <div class="output-box" id="output7">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Create Student 3 -->
+                <div class="test-card">
+                    <h3>3. Create Student - Kiran Reddy <span class="badge badge-mutation">MUTATION</span></h3>
+                    <textarea class="query-input" id="student3">mutation {
+  addStudent(
+    name: "Kiran Reddy"
+    email: "kiran@example.com"
+    rollNumber: "BCA003"
+    age: 21
+    phone: "9876543212"
+    departmentId: "YOUR_DEPARTMENT_ID"
+  ) {
+    id
+    name
+    email
+    rollNumber
+    department {
+      name
+    }
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('student3', 'output8')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('student3')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output8')">🗑️ Clear</button>
+                    <div class="output-box" id="output8">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Get All Students -->
+                <div class="test-card">
+                    <h3>4. Get All Students <span class="badge badge-query">QUERY</span></h3>
+                    <textarea class="query-input" id="student4">query {
+  students {
+    id
+    name
+    email
+    rollNumber
+    age
+    phone
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('student4', 'output9')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('student4')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output9')">🗑️ Clear</button>
+                    <div class="output-box" id="output9">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Get Students with Department -->
+                <div class="test-card">
+                    <h3>5. Get Students with Department Details <span class="badge badge-query">QUERY</span></h3>
+                    <textarea class="query-input" id="student5">query {
+  students {
+    id
+    name
+    email
+    rollNumber
+    age
+    phone
+    department {
+      name
+      code
+      hod
+    }
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('student5', 'output10')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('student5')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output10')">🗑️ Clear</button>
+                    <div class="output-box" id="output10">Click "Execute" to run the query...</div>
+                </div>
+            </div>
+
+            <!-- Advanced Queries Tab -->
+            <div id="queries" class="tab-content">
+                <h2 class="section-title">🔍 Advanced Queries</h2>
+
+                <!-- Get Department with Students -->
+                <div class="test-card">
+                    <h3>1. Get Department with All Students <span class="badge badge-query">QUERY</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_DEPARTMENT_ID with actual ID
+                    </div>
+                    <textarea class="query-input" id="query1">query {
+  department(id: "YOUR_DEPARTMENT_ID") {
+    id
+    name
+    code
+    hod
+    building
+    students {
+      id
+      name
+      email
+      rollNumber
+      age
+    }
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('query1', 'output11')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('query1')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output11')">🗑️ Clear</button>
+                    <div class="output-box" id="output11">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Search Students -->
+                <div class="test-card">
+                    <h3>2. Search Students by Name <span class="badge badge-query">QUERY</span></h3>
+                    <textarea class="query-input" id="query2">query {
+  searchStudents(name: "Ravi") {
+    id
+    name
+    email
+    rollNumber
+    department {
+      name
+    }
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('query2', 'output12')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('query2')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output12')">🗑️ Clear</button>
+                    <div class="output-box" id="output12">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Students by Department -->
+                <div class="test-card">
+                    <h3>3. Get Students by Department <span class="badge badge-query">QUERY</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_DEPARTMENT_ID with actual ID
+                    </div>
+                    <textarea class="query-input" id="query3">query {
+  studentsByDepartment(departmentId: "YOUR_DEPARTMENT_ID") {
+    id
+    name
+    email
+    rollNumber
+    age
+    phone
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('query3', 'output13')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('query3')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output13')">🗑️ Clear</button>
+                    <div class="output-box" id="output13">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Complete System Overview -->
+                <div class="test-card">
+                    <h3>4. Complete System Overview <span class="badge badge-query">QUERY</span></h3>
+                    <p>Get all departments with all their students</p>
+                    <textarea class="query-input" id="query4">query {
+  departments {
+    id
+    name
+    code
+    hod
+    building
+    students {
+      id
+      name
+      email
+      rollNumber
+      age
+      phone
+    }
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('query4', 'output14')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('query4')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output14')">🗑️ Clear</button>
+                    <div class="output-box" id="output14">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Multiple Queries -->
+                <div class="test-card">
+                    <h3>5. Multiple Queries in One Request <span class="badge badge-query">QUERY</span></h3>
+                    <textarea class="query-input" id="query5">query {
+  allStudents: students {
+    id
+    name
+    email
+  }
+  
+  allDepartments: departments {
+    id
+    name
+    code
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('query5', 'output15')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('query5')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output15')">🗑️ Clear</button>
+                    <div class="output-box" id="output15">Click "Execute" to run the query...</div>
+                </div>
+            </div>
+
+            <!-- Updates Tab -->
+            <div id="updates" class="tab-content">
+                <h2 class="section-title">✏️ Update Operations</h2>
+
+                <!-- Update Student -->
+                <div class="test-card">
+                    <h3>1. Update Student <span class="badge badge-mutation">MUTATION</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_STUDENT_ID with actual student ID
+                    </div>
+                    <textarea class="query-input" id="update1">mutation {
+  updateStudent(
+    id: "YOUR_STUDENT_ID"
+    name: "Ravi Kumar Updated"
+    age: 21
+    phone: "9999999999"
+  ) {
+    id
+    name
+    email
+    age
+    phone
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('update1', 'output16')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('update1')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output16')">🗑️ Clear</button>
+                    <div class="output-box" id="output16">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Update Department -->
+                <div class="test-card">
+                    <h3>2. Update Department <span class="badge badge-mutation">MUTATION</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_DEPARTMENT_ID with actual department ID
+                    </div>
+                    <textarea class="query-input" id="update2">mutation {
+  updateDepartment(
+    id: "YOUR_DEPARTMENT_ID"
+    hod: "Dr. New HOD Name"
+    building: "Block Z"
+  ) {
+    id
+    name
+    code
+    hod
+    building
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('update2', 'output17')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('update2')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output17')">🗑️ Clear</button>
+                    <div class="output-box" id="output17">Click "Execute" to run the query...</div>
+                </div>
+            </div>
+
+            <!-- Deletes Tab -->
+            <div id="deletes" class="tab-content">
+                <h2 class="section-title">🗑️ Delete Operations</h2>
+
+                <div class="warning-box">
+                    ⚠️ Warning: Delete operations are permanent. Use with caution!
+                </div>
+
+                <!-- Delete Student -->
+                <div class="test-card">
+                    <h3>1. Delete Student <span class="badge badge-mutation">MUTATION</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_STUDENT_ID with actual student ID
+                    </div>
+                    <textarea class="query-input" id="delete1">mutation {
+  deleteStudent(id: "YOUR_STUDENT_ID") {
+    id
+    name
+    email
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('delete1', 'output18')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('delete1')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output18')">🗑️ Clear</button>
+                    <div class="output-box" id="output18">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Delete Department -->
+                <div class="test-card">
+                    <h3>2. Delete Department <span class="badge badge-mutation">MUTATION</span></h3>
+                    <div class="warning-box">
+                        ⚠️ Replace YOUR_DEPARTMENT_ID with actual department ID<br>
+                        ⚠️ Cannot delete department with students in it
+                    </div>
+                    <textarea class="query-input" id="delete2">mutation {
+  deleteDepartment(id: "YOUR_DEPARTMENT_ID") {
+    id
+    name
+    code
+  }
+}</textarea>
+                    <button class="btn-execute" onclick="executeQuery('delete2', 'output19')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('delete2')">📋 Copy</button>
+                    <button class="btn-clear" onclick="clearOutput('output19')">🗑️ Clear</button>
+                    <div class="output-box" id="output19">Click "Execute" to run the query...</div>
+                </div>
+            </div>
+
+            <!-- Variables Tab -->
+            <div id="variables" class="tab-content">
+                <h2 class="section-title">🔧 Queries with Variables (Best Practice)</h2>
+
+                <div class="info-box">
+                    💡 Using variables is the recommended way to pass dynamic data to queries and mutations
+                </div>
+
+                <!-- Create Student with Variables -->
+                <div class="test-card">
+                    <h3>1. Create Student with Variables <span class="badge badge-mutation">MUTATION</span> <span class="badge badge-variables">VARIABLES</span></h3>
+                    <p><strong>Query:</strong></p>
+                    <textarea class="query-input" id="var1">mutation CreateStudent($name: String!, $email: String!, $rollNumber: String!, $age: Int, $phone: String, $departmentId: ID!) {
+  addStudent(
+    name: $name
+    email: $email
+    rollNumber: $rollNumber
+    age: $age
+    phone: $phone
+    departmentId: $departmentId
+  ) {
+    id
+    name
+    email
+    rollNumber
+    department {
+      name
+    }
+  }
+}</textarea>
+                    <p><strong>Variables:</strong></p>
+                    <textarea class="variables-input" id="var1vars">{
+  "name": "Meena Kumari",
+  "email": "meena@example.com",
+  "rollNumber": "BCA006",
+  "age": 20,
+  "phone": "9876543215",
+  "departmentId": "YOUR_DEPARTMENT_ID"
+}</textarea>
+                    <button class="btn-execute" onclick="executeQueryWithVars('var1', 'var1vars', 'output20')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('var1')">📋 Copy Query</button>
+                    <button class="btn-clear" onclick="clearOutput('output20')">🗑️ Clear</button>
+                    <div class="output-box" id="output20">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Get Student with Variables -->
+                <div class="test-card">
+                    <h3>2. Get Student with Variables <span class="badge badge-query">QUERY</span> <span class="badge badge-variables">VARIABLES</span></h3>
+                    <p><strong>Query:</strong></p>
+                    <textarea class="query-input" id="var2">query GetStudent($studentId: ID!) {
+  student(id: $studentId) {
+    id
+    name
+    email
+    rollNumber
+    department {
+      name
+      code
+      hod
+    }
+  }
+}</textarea>
+                    <p><strong>Variables:</strong></p>
+                    <textarea class="variables-input" id="var2vars">{
+  "studentId": "YOUR_STUDENT_ID"
+}</textarea>
+                    <button class="btn-execute" onclick="executeQueryWithVars('var2', 'var2vars', 'output21')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('var2')">📋 Copy Query</button>
+                    <button class="btn-clear" onclick="clearOutput('output21')">🗑️ Clear</button>
+                    <div class="output-box" id="output21">Click "Execute" to run the query...</div>
+                </div>
+
+                <!-- Update Student with Variables -->
+                <div class="test-card">
+                    <h3>3. Update Student with Variables <span class="badge badge-mutation">MUTATION</span> <span class="badge badge-variables">VARIABLES</span></h3>
+                    <p><strong>Query:</strong></p>
+                    <textarea class="query-input" id="var3">mutation UpdateStudent($id: ID!, $name: String, $age: Int, $phone: String) {
+  updateStudent(
+    id: $id
+    name: $name
+    age: $age
+    phone: $phone
+  ) {
+    id
+    name
+    email
+    age
+    phone
+  }
+}</textarea>
+                    <p><strong>Variables:</strong></p>
+                    <textarea class="variables-input" id="var3vars">{
+  "id": "YOUR_STUDENT_ID",
+  "name": "Updated Name",
+  "age": 22,
+  "phone": "8888888888"
+}</textarea>
+                    <button class="btn-execute" onclick="executeQueryWithVars('var3', 'var3vars', 'output22')">▶️ Execute</button>
+                    <button class="btn-copy" onclick="copyQuery('var3')">📋 Copy Query</button>
+                    <button class="btn-clear" onclick="clearOutput('output22')">🗑️ Clear</button>
+                    <div class="output-box" id="output22">Click "Execute" to run the query...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Stats
+        let totalTests = 0;
+        let successTests = 0;
+        let failedTests = 0;
+
+        // Show Tab
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Execute Query
+        async function executeQuery(queryId, outputId) {
+            const query = document.getElementById(queryId).value;
+            const outputElement = document.getElementById(outputId);
+            
+            outputElement.innerHTML = '<span class="loading"></span> Executing query...';
+            totalTests++;
+            updateStats();
+
+            try {
+                const response = await fetch('http://localhost:4000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    failedTests++;
+                    updateStats();
+                    outputElement.innerHTML = '<span class="error">❌ ERROR:</span>\n' + JSON.stringify(result, null, 2);
+                } else {
+                    successTests++;
+                    updateStats();
+                    outputElement.innerHTML = '<span class="success">✅ SUCCESS:</span>\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                failedTests++;
+                updateStats();
+                outputElement.innerHTML = '<span class="error">❌ ERROR:</span>\n' + error.message + '\n\n⚠️ Make sure your GraphQL server is running at http://localhost:4000/graphql';
+            }
+        }
+
+        // Execute Query with Variables
+        async function executeQueryWithVars(queryId, varsId, outputId) {
+            const query = document.getElementById(queryId).value;
+            const variablesText = document.getElementById(varsId).value;
+            const outputElement = document.getElementById(outputId);
+            
+            outputElement.innerHTML = '<span class="loading"></span> Executing query with variables...';
+            totalTests++;
+            updateStats();
+
+            try {
+                const variables = JSON.parse(variablesText);
+
+                const response = await fetch('http://localhost:4000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    failedTests++;
+                    updateStats();
+                    outputElement.innerHTML = '<span class="error">❌ ERROR:</span>\n' + JSON.stringify(result, null, 2);
+                } else {
+                    successTests++;
+                    updateStats();
+                    outputElement.innerHTML = '<span class="success">✅ SUCCESS:</span>\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                failedTests++;
+                updateStats();
+                outputElement.innerHTML = '<span class="error">❌ ERROR:</span>\n' + error.message + '\n\n⚠️ Make sure your GraphQL server is running and variables JSON is valid';
+            }
+        }
+
+        // Copy Query
+        function copyQuery(queryId) {
+            const query = document.getElementById(queryId).value;
+            navigator.clipboard.writeText(query).then(() => {
+                alert('✅ Query copied to clipboard!');
+            }).catch(err => {
+                alert('❌ Failed to copy: ' + err);
+            });
+        }
+
+        // Clear Output
+        function clearOutput(outputId) {
+            document.getElementById(outputId).textContent = 'Output cleared...';
+        }
+
+        // Update Stats
+        function updateStats() {
+            document.getElementById('totalTests').textContent = totalTests;
+            document.getElementById('successTests').textContent = successTests;
+            document.getElementById('failedTests').textContent = failedTests;
+        }
+
+        // Load stats from localStorage on page load
+        window.addEventListener('load', () => {
+            const savedStats = localStorage.getItem('graphqlPracticeStats');
+            if (savedStats) {
+                const stats = JSON.parse(savedStats);
+                totalTests = stats.total || 0;
+                successTests = stats.success || 0;
+                failedTests = stats.failed || 0;
+                updateStats();
+            }
+        });
+
+        // Save stats to localStorage before page unload
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('graphqlPracticeStats', JSON.stringify({
+                total: totalTests,
+                success: successTests,
+                failed: failedTests
+            }));
+        });
+    </script>
+</body>
+</html>

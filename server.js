@@ -3,7 +3,7 @@ const { graphqlHTTP } = require('express-graphql');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const schema = require('./schema/schema');
-
+const path = require('path');
 const app = express();
 
 // ==================== MIDDLEWARE ====================
@@ -22,7 +22,7 @@ mongoose.connect('mongodb://localhost:27017/student_system', {
 })
 .then(() => console.log('✅ MongoDB Connected'))
 .catch(err => console.log('❌ MongoDB Error:', err));
-
+app.use('/docs', express.static(path.join(__dirname, 'docs')));
 // ==================== GRAPHQL ENDPOINT ====================
 
 app.use('/graphql', graphqlHTTP({

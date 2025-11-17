@@ -1,0 +1,223 @@
+curl http://localhost:4000/
+
+CREATE DEPARTMENT
+Test 1: Create BCA Department
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addDepartment(name: \"Computer Applications\", code: \"BCA\", hod: \"Dr. Rama Krishna\", building: \"Block A\") { id name code hod building } }"
+}'
+
+
+Test 2: Create CSE Department
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addDepartment(name: \"Computer Science Engineering\", code: \"CSE\", hod: \"Dr. Sharma\", building: \"Block B\") { id name code hod building } }"
+}'
+Test 3: Create ECE Department
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addDepartment(name: \"Electronics Engineering\", code: \"ECE\", hod: \"Dr. Kumar\", building: \"Block C\") { id name code hod building } }"
+}'
+Test 4: Create Mechanical Department
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addDepartment(name: \"Mechanical Engineering\", code: \"MECH\", hod: \"Dr. Reddy\", building: \"Block D\") { id name code hod building } }"
+}'
+
+2️⃣ GET ALL DEPARTMENTS
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { departments { id name code hod building } }"
+}'
+Pretty Print Response (with jq)
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { departments { id name code hod building } }"
+}' | jq
+
+3️⃣ GET SINGLE DEPARTMENT
+⚠️ Replace YOUR_DEPARTMENT_ID with actual ID from step 1
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { department(id: \"YOUR_DEPARTMENT_ID\") { id name code hod building } }"
+}'
+Example with actual ID:
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { department(id: \"6543210abcdef12345678901\") { id name code hod building } }"
+}'
+
+4️⃣ CREATE STUDENTS
+⚠️ Replace YOUR_DEPARTMENT_ID with BCA department ID
+Test 1: Create Student - Ravi Kumar
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addStudent(name: \"Ravi Kumar\", email: \"ravi@example.com\", rollNumber: \"BCA001\", age: 20, phone: \"9876543210\", departmentId: \"YOUR_DEPARTMENT_ID\") { id name email rollNumber age phone department { name code } } }"
+}'
+Test 2: Create Student - Priya Sharma
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addStudent(name: \"Priya Sharma\", email: \"priya@example.com\", rollNumber: \"BCA002\", age: 19, phone: \"9876543211\", departmentId: \"YOUR_DEPARTMENT_ID\") { id name email rollNumber age department { name } } }"
+}'
+Test 3: Create Student - Kiran Reddy
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addStudent(name: \"Kiran Reddy\", email: \"kiran@example.com\", rollNumber: \"BCA003\", age: 21, phone: \"9876543212\", departmentId: \"YOUR_DEPARTMENT_ID\") { id name email rollNumber department { name } } }"
+}'
+Test 4: Create Student - Anjali Verma
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addStudent(name: \"Anjali Verma\", email: \"anjali@example.com\", rollNumber: \"BCA004\", age: 20, phone: \"9876543213\", departmentId: \"YOUR_DEPARTMENT_ID\") { id name email rollNumber department { name } } }"
+}'
+Test 5: Create Student - Suresh Kumar
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { addStudent(name: \"Suresh Kumar\", email: \"suresh@example.com\", rollNumber: \"BCA005\", age: 22, phone: \"9876543214\", departmentId: \"YOUR_DEPARTMENT_ID\") { id name email rollNumber age department { name code } } }"
+}'
+
+5️⃣ GET ALL STUDENTS
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { students { id name email rollNumber age phone } }"
+}'
+Get Students with Department Details
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { students { id name email rollNumber age phone department { name code hod } } }"
+}'
+
+6️⃣ GET SINGLE STUDENT
+⚠️ Replace YOUR_STUDENT_ID
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { student(id: \"YOUR_STUDENT_ID\") { id name email rollNumber age phone department { name code hod building } } }"
+}'
+
+7️⃣ GET DEPARTMENT WITH STUDENTS
+⚠️ Replace YOUR_DEPARTMENT_ID
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { department(id: \"YOUR_DEPARTMENT_ID\") { id name code hod building students { id name email rollNumber age } } }"
+}'
+
+8️⃣ SEARCH STUDENTS BY NAME
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { searchStudents(name: \"Ravi\") { id name email rollNumber department { name } } }"
+}'
+Search for "Kumar"
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { searchStudents(name: \"Kumar\") { id name email rollNumber department { name } } }"
+}'
+
+9️⃣ GET STUDENTS BY DEPARTMENT
+⚠️ Replace YOUR_DEPARTMENT_ID
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { studentsByDepartment(departmentId: \"YOUR_DEPARTMENT_ID\") { id name email rollNumber age phone } }"
+}'
+
+🔟 UPDATE STUDENT
+⚠️ Replace YOUR_STUDENT_ID
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { updateStudent(id: \"YOUR_STUDENT_ID\", name: \"Ravi Kumar Updated\", age: 21, phone: \"9999999999\") { id name email age phone } }"
+}'
+
+1️⃣1️⃣ UPDATE DEPARTMENT
+⚠️ Replace YOUR_DEPARTMENT_ID
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { updateDepartment(id: \"YOUR_DEPARTMENT_ID\", hod: \"Dr. New HOD Name\", building: \"Block Z\") { id name code hod building } }"
+}'
+
+1️⃣2️⃣ DELETE STUDENT
+⚠️ Replace YOUR_STUDENT_ID
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { deleteStudent(id: \"YOUR_STUDENT_ID\") { id name email } }"
+}'
+
+1️⃣3️⃣ DELETE DEPARTMENT
+⚠️ Replace YOUR_DEPARTMENT_ID
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation { deleteDepartment(id: \"YOUR_DEPARTMENT_ID\") { id name code } }"
+}'
+
+1️⃣4️⃣ COMPLEX QUERIES
+Get Complete System Overview
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { departments { id name code hod building students { id name email rollNumber age phone } } }"
+}'
+Multiple Queries in One Request
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query { allStudents: students { id name email } allDepartments: departments { id name code } }"
+}'
+
+1️⃣5️⃣ WITH VARIABLES (Best Practice)
+Create Student with Variables
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation CreateStudent($name: String!, $email: String!, $rollNumber: String!, $age: Int, $phone: String, $departmentId: ID!) { addStudent(name: $name, email: $email, rollNumber: $rollNumber, age: $age, phone: $phone, departmentId: $departmentId) { id name email rollNumber department { name } } }",
+  "variables": {
+    "name": "Meena Kumari",
+    "email": "meena@example.com",
+    "rollNumber": "BCA006",
+    "age": 20,
+    "phone": "9876543215",
+    "departmentId": "YOUR_DEPARTMENT_ID"
+  }
+}'
+Get Student with Variables
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "query GetStudent($studentId: ID!) { student(id: $studentId) { id name email rollNumber department { name code hod } } }",
+  "variables": {
+    "studentId": "YOUR_STUDENT_ID"
+  }
+}'
+Update Student with Variables
+curl -X POST http://localhost:4000/graphql \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "mutation UpdateStudent($id: ID!, $name: String, $age: Int, $phone: String) { updateStudent(id: $id, name: $name, age: $age, phone: $phone) { id name email age phone } }",
+  "variables": {
+    "id": "YOUR_STUDENT_ID",
+    "name": "Updated Name",
+    "age": 22,
+    "phone": "8888888888"
+  }
+}'
+

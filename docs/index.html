@@ -1,0 +1,4409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL Fundamentals - Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .nav {
+            background: #2d3748;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn {
+            padding: 18px 25px;
+            background: #2d3748;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .nav-btn:hover {
+            background: #4a5568;
+            border-bottom-color: #667eea;
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+            border-bottom-color: #764ba2;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin: 35px 0 20px 0;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+            border-left: 6px solid #667eea;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        .concept-box h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .example-box {
+            background: #e7f3ff;
+            border-left: 6px solid #2196F3;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(33, 150, 243, 0.1);
+        }
+
+        .example-box h4 {
+            color: #2196F3;
+            margin-top: 0;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(255, 193, 7, 0.1);
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 6px solid #28a745;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(40, 167, 69, 0.1);
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 6px solid #17a2b8;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(23, 162, 184, 0.1);
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .inline-code {
+            background: #f4f4f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 3px 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-size: 1.1em;
+        }
+
+        .comparison-table td {
+            padding: 18px;
+            border-bottom: 1px solid #ddd;
+            background: white;
+        }
+
+        .comparison-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+            border-color: #764ba2;
+        }
+
+        .feature-card .icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            margin: 15px 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 50px;
+        }
+
+        li {
+            margin: 12px 0;
+            line-height: 1.8;
+        }
+
+        .highlight {
+            background: #ffd700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-success { background: #28a745; }
+        .badge-warning { background: #ffc107; color: #000; }
+        .badge-danger { background: #dc3545; }
+        .badge-info { background: #17a2b8; }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 25px 0;
+        }
+
+        .diagram {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .arrow {
+            color: #667eea;
+            font-size: 2em;
+            margin: 10px 0;
+        }
+
+        .step-card {
+            background: white;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .content { padding: 25px; }
+            .nav-btn { padding: 12px 15px; font-size: 12px; }
+            .split-layout { grid-template-columns: 1fr; }
+        }
+
+        .footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 0;
+        }
+
+        .footer a {
+            color: #64B5F6;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📚 GraphQL Fundamentals</h1>
+            <p>Complete Guide with Student-Department Examples</p>
+            <p style="font-size: 0.9em; margin-top: 15px;">Master GraphQL from Basics to Advanced</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
+            <button class="nav-btn" onclick="showSection('field-spec')">Field Specification</button>
+            <button class="nav-btn" onclick="showSection('graph-based')">Graph Based</button>
+            <button class="nav-btn" onclick="showSection('single-endpoint')">Single Endpoint</button>
+            <button class="nav-btn" onclick="showSection('strongly-typed')">Strongly Typed</button>
+            <button class="nav-btn" onclick="showSection('introspection')">Introspection</button>
+            <button class="nav-btn" onclick="showSection('libraries')">Libraries</button>
+            <button class="nav-btn" onclick="showSection('schema')">Schema File</button>
+            <button class="nav-btn" onclick="showSection('list-api')">List API</button>
+            <button class="nav-btn" onclick="showSection('create-api')">Create API</button>
+            <button class="nav-btn" onclick="showSection('variables')">Query Variables</button>
+            <button class="nav-btn" onclick="showSection('validations')">Input Validations</button>
+            <button class="nav-btn" onclick="showSection('errors')">Error Handling</button>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="content">
+
+            <!-- 1. Introduction -->
+            <div id="intro" class="section active">
+                <h2>🎯 What is GraphQL?</h2>
+
+                <div class="concept-box">
+                    <h4>Simple Definition</h4>
+                    <p><strong>GraphQL</strong> is a query language for APIs that lets you ask for <span class="highlight">exactly what you need</span> - nothing more, nothing less.</p>
+                    <p style="margin-top: 15px;"><strong>Created by:</strong> Facebook (2012) → Open Source (2015)</p>
+                </div>
+
+                <h3>Real-World Analogy 🍽️</h3>
+                <div class="split-layout">
+                    <div class="example-box">
+                        <h4>Traditional REST API</h4>
+                        <p>Like ordering a <strong>set meal</strong></p>
+                        <p>🍽️ You get everything on the menu:</p>
+                        <ul style="text-align: left;">
+                            <li>Rice (needed ✓)</li>
+                            <li>Dal (needed ✓)</li>
+                            <li>Curry (don't want ✗)</li>
+                            <li>Roti (don't want ✗)</li>
+                            <li>Salad (don't want ✗)</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>GraphQL</h4>
+                        <p>Like ordering <strong>à la carte</strong></p>
+                        <p>🎯 You choose exactly what you want:</p>
+                        <ul style="text-align: left;">
+                            <li>Rice (ordered ✓)</li>
+                            <li>Dal (ordered ✓)</li>
+                            <li><em>Nothing else!</em></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Key Features</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">🎯</div>
+                        <h4>Precise Data</h4>
+                        <p>Get exactly what you ask for</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">⚡</div>
+                        <h4>Single Request</h4>
+                        <p>One query, all data</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🔗</div>
+                        <h4>Connected Data</h4>
+                        <p>Fetch related data easily</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🛡️</div>
+                        <h4>Type Safety</h4>
+                        <p>Catch errors early</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📖</div>
+                        <h4>Self-Documenting</h4>
+                        <p>Built-in documentation</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🚀</div>
+                        <h4>Fast Performance</h4>
+                        <p>Optimized data fetching</p>
+                    </div>
+                </div>
+
+                <h3>Student-Department System Example</h3>
+                <div class="info-box">
+                    <p><strong>Throughout this tutorial, we'll use a simple Student Management System:</strong></p>
+                    <ul>
+                        <li><strong>Students:</strong> name, email, rollNumber, age, phone</li>
+                        <li><strong>Departments:</strong> name, code, HOD, building</li>
+                        <li><strong>Relationship:</strong> Students belong to Departments</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 2. Field Specification -->
+            <div id="field-spec" class="section">
+                <h2>📋 Field Specification</h2>
+
+                <div class="concept-box">
+                    <h4>What is Field Specification?</h4>
+                    <p><strong>Field Specification</strong> means you explicitly choose which fields you want in the response. GraphQL will return <span class="highlight">only those fields</span> - nothing extra!</p>
+                </div>
+
+                <h3>The Problem with Traditional APIs</h3>
+                <div class="example-box">
+                    <h4>REST API Response (Fixed Structure)</h4>
+                    <div class="code-block">
+<pre>
+GET /api/students/1
+
+// You get EVERYTHING whether you need it or not:
+{
+  "id": "1",
+  "name": "Ravi Kumar",           ← Need this
+  "email": "ravi@example.com",    ← Need this
+  "rollNumber": "BCA001",
+  "age": 20,
+  "phone": "9876543210",
+  "address": "123 Main St...",    ← Don't need
+  "dateOfBirth": "2003-05-15",   ← Don't need
+  "guardianName": "Mr. Kumar",    ← Don't need
+  "bloodGroup": "O+",             ← Don't need
+  "emergencyContact": "...",      ← Don't need
+  "createdAt": "2024-01-01",     ← Don't need
+  "updatedAt": "2024-01-15"      ← Don't need
+}
+
+Problem: Over-fetching! ❌
+</pre>
+                    </div>
+                </div>
+
+                <h3>GraphQL Solution: Choose Your Fields</h3>
+                <div class="example-box">
+                    <h4>GraphQL Query (Custom Fields)</h4>
+                    <div class="code-block">
+<pre>
+query {
+  student(id: "1") {
+    name        ← I want this
+    email       ← I want this
+  }
+}
+
+// You get ONLY what you asked for:
+{
+  "data": {
+    "student": {
+      "name": "Ravi Kumar",
+      "email": "ravi@example.com"
+    }
+  }
+}
+
+Solution: Perfect! ✅
+</pre>
+                    </div>
+                </div>
+
+                <h3>More Examples</h3>
+
+                <div class="step-card">
+                    <span class="step-number">1</span>
+                    <strong>Get only student names</strong>
+                    <div class="code-block">
+<pre>
+query {
+  students {
+    name
+  }
+}
+
+Response:
+{
+  "data": {
+    "students": [
+      { "name": "Ravi Kumar" },
+      { "name": "Priya Sharma" },
+      { "name": "Kiran Reddy" }
+    ]
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">2</span>
+                    <strong>Get student name, email, and roll number</strong>
+                    <div class="code-block">
+<pre>
+query {
+  students {
+    name
+    email
+    rollNumber
+  }
+}
+
+Response:
+{
+  "data": {
+    "students": [
+      {
+        "name": "Ravi Kumar",
+        "email": "ravi@example.com",
+        "rollNumber": "BCA001"
+      }
+    ]
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">3</span>
+                    <strong>Get department name and code only</strong>
+                    <div class="code-block">
+<pre>
+query {
+  departments {
+    name
+    code
+  }
+}
+
+Response:
+{
+  "data": {
+    "departments": [
+      { "name": "Computer Applications", "code": "BCA" },
+      { "name": "Computer Science", "code": "CSE" }
+    ]
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Benefits of Field Specification</h4>
+                    <ul>
+                        <li><strong>No Over-fetching:</strong> Don't get unnecessary data</li>
+                        <li><strong>Faster Response:</strong> Less data = faster transfer</li>
+                        <li><strong>Saves Bandwidth:</strong> Important for mobile apps</li>
+                        <li><strong>Client Control:</strong> Each client decides what it needs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 3. Graph Based -->
+            <div id="graph-based" class="section">
+                <h2>🔗 Graph-Based Architecture</h2>
+
+                <div class="concept-box">
+                    <h4>What Does "Graph-Based" Mean?</h4>
+                    <p><strong>Graph-Based</strong> means data is structured like a graph - objects are connected through relationships. You can traverse these relationships in a single query!</p>
+                </div>
+
+                <h3>Understanding the Graph Structure</h3>
+                <div class="diagram">
+                    <div style="font-size: 1.5em; margin: 20px 0;">
+                        <div style="display: inline-block; background: #667eea; color: white; padding: 20px; border-radius: 10px; margin: 10px;">
+                            <strong>Student</strong><br>
+                            <small>name, email, rollNumber</small>
+                        </div>
+                        <div class="arrow">→ belongs to →</div>
+                        <div style="display: inline-block; background: #764ba2; color: white; padding: 20px; border-radius: 10px; margin: 10px;">
+                            <strong>Department</strong><br>
+                            <small>name, code, HOD</small>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>The Problem: Under-fetching in REST</h3>
+                <div class="example-box">
+                    <h4>REST API (Multiple Requests Needed)</h4>
+                    <div class="code-block">
+<pre>
+// Request 1: Get student
+GET /api/students/1
+
+Response:
+{
+  "id": "1",
+  "name": "Ravi Kumar",
+  "email": "ravi@example.com",
+  "departmentId": "101"        ← Just an ID, not the full data
+}
+
+// Request 2: Get department details
+GET /api/departments/101
+
+Response:
+{
+  "id": "101",
+  "name": "Computer Applications",
+  "code": "BCA",
+  "hod": "Dr. Rama Krishna"
+}
+
+Problem: Need 2 requests! ❌
+</pre>
+                    </div>
+                </div>
+
+                <h3>GraphQL Solution: Nested Queries</h3>
+                <div class="example-box">
+                    <h4>Get Student WITH Department in ONE Request</h4>
+                    <div class="code-block">
+<pre>
+query {
+  student(id: "1") {
+    name
+    email
+    rollNumber
+    department {          ← Follow the relationship
+      name
+      code
+      hod
+      building
+    }
+  }
+}
+
+Response - Everything in ONE request:
+{
+  "data": {
+    "student": {
+      "name": "Ravi Kumar",
+      "email": "ravi@example.com",
+      "rollNumber": "BCA001",
+      "department": {
+        "name": "Computer Applications",
+        "code": "BCA",
+        "hod": "Dr. Rama Krishna",
+        "building": "Block A"
+      }
+    }
+  }
+}
+
+Solution: Perfect! ✅ One request, all data!
+</pre>
+                    </div>
+                </div>
+
+                <h3>Reverse Relationship</h3>
+                <div class="example-box">
+                    <h4>Get Department WITH All Its Students</h4>
+                    <div class="code-block">
+<pre>
+query {
+  department(id: "101") {
+    name
+    code
+    hod
+    students {           ← Follow reverse relationship
+      name
+      email
+      rollNumber
+      age
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "department": {
+      "name": "Computer Applications",
+      "code": "BCA",
+      "hod": "Dr. Rama Krishna",
+      "students": [
+        {
+          "name": "Ravi Kumar",
+          "email": "ravi@example.com",
+          "rollNumber": "BCA001",
+          "age": 20
+        },
+        {
+          "name": "Priya Sharma",
+          "email": "priya@example.com",
+          "rollNumber": "BCA002",
+          "age": 19
+        }
+      ]
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>Deep Nesting Example</h3>
+                <div class="example-box">
+                    <h4>Get All Departments with All Students and Their Details</h4>
+                    <div class="code-block">
+<pre>
+query {
+  departments {
+    name
+    code
+    students {
+      name
+      email
+      rollNumber
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "departments": [
+      {
+        "name": "Computer Applications",
+        "code": "BCA",
+        "students": [
+          {
+            "name": "Ravi Kumar",
+            "email": "ravi@example.com",
+            "rollNumber": "BCA001"
+          },
+          {
+            "name": "Priya Sharma",
+            "email": "priya@example.com",
+            "rollNumber": "BCA002"
+          }
+        ]
+      },
+      {
+        "name": "Computer Science",
+        "code": "CSE",
+        "students": [
+          {
+            "name": "Kiran Reddy",
+            "email": "kiran@example.com",
+            "rollNumber": "CSE001"
+          }
+        ]
+      }
+    ]
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Benefits of Graph-Based Structure</h4>
+                    <ul>
+                        <li><strong>Single Request:</strong> Get related data in one go</li>
+                        <li><strong>No Under-fetching:</strong> Get everything you need</li>
+                        <li><strong>Flexible Depth:</strong> Go as deep as you want</li>
+                        <li><strong>Efficient:</strong> Reduces network requests dramatically</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 4. Single Endpoint -->
+            <div id="single-endpoint" class="section">
+                <h2>🎯 Single Endpoint Architecture</h2>
+
+                <div class="concept-box">
+                    <h4>What is Single Endpoint?</h4>
+                    <p>GraphQL uses <span class="highlight">ONE URL</span> for all operations. Unlike REST which has multiple URLs, GraphQL has just <strong>/graphql</strong></p>
+                </div>
+
+                <h3>REST vs GraphQL Endpoints</h3>
+                <div class="split-layout">
+                    <div class="example-box">
+                        <h4>REST API (Multiple Endpoints)</h4>
+                        <div class="code-block">
+<pre>
+GET    /api/students
+GET    /api/students/1
+POST   /api/students
+PUT    /api/students/1
+DELETE /api/students/1
+
+GET    /api/departments
+GET    /api/departments/1
+POST   /api/departments
+PUT    /api/departments/1
+DELETE /api/departments/1
+
+GET    /api/students/1/marks
+GET    /api/departments/1/students
+
+... and many more!
+
+Problem: Too many URLs! ❌
+</pre>
+                        </div>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>GraphQL (Single Endpoint)</h4>
+                        <div class="code-block">
+<pre>
+POST /graphql
+
+That's it! ✅
+
+All operations go here:
+- Get students
+- Get student by ID
+- Create student
+- Update student
+- Delete student
+- Get departments
+- Get department by ID
+- Create department
+- Update department
+- Delete department
+- Search students
+- Get students by department
+- ... everything!
+
+One endpoint to rule them all!
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>How It Works</h3>
+                <div class="diagram">
+                    <div style="text-align: left; max-width: 600px; margin: 0 auto;">
+                        <div class="step-card">
+                            <span class="step-number">1</span>
+                            <strong>Client sends POST request to /graphql</strong>
+                        </div>
+                        <div class="arrow">↓</div>
+                        <div class="step-card">
+                            <span class="step-number">2</span>
+                            <strong>Request body contains the query/mutation</strong>
+                        </div>
+                        <div class="arrow">↓</div>
+                        <div class="step-card">
+                            <span class="step-number">3</span>
+                            <strong>Server processes the query</strong>
+                        </div>
+                        <div class="arrow">↓</div>
+                        <div class="step-card">
+                            <span class="step-number">4</span>
+                            <strong>Server returns JSON response</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Example Requests to Single Endpoint</h3>
+
+                <div class="example-box">
+                    <h4>Query 1: Get All Students</h4>
+                    <div class="code-block">
+<pre>
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "{ students { name email } }"
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>Query 2: Create Student</h4>
+                    <div class="code-block">
+<pre>
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { addStudent(name: \"Ravi\", email: \"ravi@example.com\") { id name } }"
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>Query 3: Get Department with Students</h4>
+                    <div class="code-block">
+<pre>
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "{ department(id: \"1\") { name students { name } } }"
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>📝 Important Notes</h4>
+                    <ul>
+                        <li><strong>Always POST:</strong> Even for reading data (queries)</li>
+                        <li><strong>Same URL:</strong> All operations use /graphql</li>
+                        <li><strong>Query in Body:</strong> The operation is in the request body</li>
+                        <li><strong>JSON Format:</strong> Request and response are JSON</li>
+                    </ul>
+                </div>
+
+                <h3>Configuration Example</h3>
+                <div class="example-box">
+                    <h4>Setting Up Single Endpoint (Node.js + Express)</h4>
+                    <div class="code-block">
+<pre>
+const express = require('express');
+const { graphqlHTTP } = require('express-graphql');
+const schema = require('./schema');
+
+const app = express();
+
+// Single endpoint configuration
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  graphiql: true  // GraphiQL playground
+}));
+
+app.listen(4000, () => {
+  console.log('Server running on http://localhost:4000/graphql');
+});
+
+// That's it! All GraphQL operations now work on /graphql
+</pre>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Benefits of Single Endpoint</h4>
+                    <ul>
+                        <li><strong>Simple:</strong> One URL to remember</li>
+                        <li><strong>Easy CORS:</strong> Configure once for one endpoint</li>
+                        <li><strong>Easy Caching:</strong> All requests go to same place</li>
+                        <li><strong>Easy Monitoring:</strong> Monitor one endpoint</li>
+                        <li><strong>No Versioning:</strong> Evolve schema without URL changes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 5. Strongly Typed -->
+            <div id="strongly-typed" class="section">
+                <h2>🛡️ Strongly Typed System</h2>
+
+                <div class="concept-box">
+                    <h4>What is Strongly Typed?</h4>
+                    <p>Every field in GraphQL has a <span class="highlight">specific data type</span>. The type system ensures you get the right kind of data and catches errors before runtime!</p>
+                </div>
+
+                <h3>GraphQL Scalar Types</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Example Values</th>
+                        <th>JavaScript Equivalent</th>
+                    </tr>
+                    <tr>
+                        <td><code>String</code></td>
+                        <td>Text data</td>
+                        <td>"Ravi Kumar", "BCA", "ravi@example.com"</td>
+                        <td>string</td>
+                    </tr>
+                    <tr>
+                        <td><code>Int</code></td>
+                        <td>32-bit integer</td>
+                        <td>20, 100, -5, 0</td>
+                        <td>number</td>
+                    </tr>
+                    <tr>
+                        <td><code>Float</code></td>
+                        <td>Decimal numbers</td>
+                        <td>8.5, 3.14, 99.99</td>
+                        <td>number</td>
+                    </tr>
+                    <tr>
+                        <td><code>Boolean</code></td>
+                        <td>True or False</td>
+                        <td>true, false</td>
+                        <td>boolean</td>
+                    </tr>
+                    <tr>
+                        <td><code>ID</code></td>
+                        <td>Unique identifier</td>
+                        <td>"abc123", "1", "user_001"</td>
+                        <td>string</td>
+                    </tr>
+                </table>
+
+                <h3>Type Modifiers</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">!</div>
+                        <h4>Required (Non-null)</h4>
+                        <p><code>String!</code></p>
+                        <p style="margin-top: 10px;">Field MUST have a value<br>Cannot be null</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">[ ]</div>
+                        <h4>List (Array)</h4>
+                        <p><code>[Student]</code></p>
+                        <p style="margin-top: 10px;">Array of Student objects</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">[!]</div>
+                        <h4>Required List</h4>
+                        <p><code>[Student]!</code></p>
+                        <p style="margin-top: 10px;">List cannot be null<br>(but can be empty)</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">[!]!</div>
+                        <h4>Required Items</h4>
+                        <p><code>[Student!]!</code></p>
+                        <p style="margin-top: 10px;">List required + Items cannot be null</p>
+                    </div>
+                </div>
+
+                <h3>Student Type Example</h3>
+                <div class="example-box">
+                    <h4>Complete Student Type Definition</h4>
+                    <div class="code-block">
+<pre>
+type Student {
+  id: ID!                 ← Required ID
+  name: String!           ← Required String
+  email: String!          ← Required String
+  rollNumber: String!     ← Required String
+  age: Int                ← Optional Integer
+  phone: String           ← Optional String
+  isActive: Boolean       ← Optional Boolean
+  gpa: Float              ← Optional Float (decimal)
+  department: Department! ← Required Department object
+}
+
+Explanation:
+- id, name, email, rollNumber → MUST have values (!)
+- age, phone, isActive, gpa → Can be null
+- department → MUST be a Department object
+</pre>
+                    </div>
+                </div>
+
+                <h3>Department Type Example</h3>
+                <div class="example-box">
+                    <h4>Complete Department Type Definition</h4>
+                    <div class="code-block">
+<pre>
+type Department {
+  id: ID!                ← Required ID
+  name: String!          ← Required String
+  code: String!          ← Required String (BCA, CSE, etc.)
+  hod: String!           ← Required String (Head of Department)
+  building: String       ← Optional String
+  students: [Student]    ← Optional list of Students
+}
+
+Explanation:
+- id, name, code, hod → MUST have values
+- building → Can be null
+- students → Can be null, or empty array, or array of students
+</pre>
+                    </div>
+                </div>
+
+                <h3>Type Safety in Action</h3>
+                <div class="split-layout">
+                    <div class="example-box">
+                        <h4>❌ Wrong Type - Error!</h4>
+                        <div class="code-block">
+<pre>
+mutation {
+  addStudent(
+    name: "Ravi"
+    email: "ravi@example.com"
+    age: "twenty"        ← String instead of Int
+  ) {
+    id
+  }
+}
+
+Error:
+{
+  "errors": [{
+    "message": "Int cannot represent non-integer value: \"twenty\"",
+    "locations": [{"line": 4, "column": 10}]
+  }]
+}
+
+GraphQL caught the error! ✅
+</pre>
+                        </div>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>✅ Correct Type - Success!</h4>
+                        <div class="code-block">
+<pre>
+mutation {
+  addStudent(
+    name: "Ravi"
+    email: "ravi@example.com"
+    age: 20              ← Correct Int type
+  ) {
+    id
+  }
+}
+
+Response:
+{
+  "data": {
+    "addStudent": {
+      "id": "123"
+    }
+  }
+}
+
+Success! ✅
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Required vs Optional Examples</h3>
+                <div class="example-box">
+                    <h4>Testing Required Fields</h4>
+                    <div class="code-block">
+<pre>
+// ❌ Missing required field 'name'
+mutation {
+  addStudent(
+    email: "ravi@example.com"
+    rollNumber: "BCA001"
+  ) {
+    id
+  }
+}
+
+Error: Field "addStudent.name" of required type "String!" was not provided.
+
+// ✅ All required fields provided
+mutation {
+  addStudent(
+    name: "Ravi Kumar"          ← Required ✓
+    email: "ravi@example.com"   ← Required ✓
+    rollNumber: "BCA001"        ← Required ✓
+    departmentId: "101"         ← Required ✓
+  ) {
+    id
+  }
+}
+
+Success! ✅
+</pre>
+                    </div>
+                </div>
+
+                <h3>List Types Example</h3>
+                <div class="example-box">
+                    <h4>Understanding List Types</h4>
+                    <div class="code-block">
+<pre>
+type Department {
+  students: [Student]      ← Can be null, [], or [student1, student2]
+  subjects: [String]!      ← Cannot be null, but can be []
+  teachers: [String!]!     ← Cannot be null, cannot have null items
+}
+
+Examples:
+
+1. students: [Student]
+   ✅ null
+   ✅ []
+   ✅ [student1, student2]
+   ✅ [student1, null, student2]
+
+2. subjects: [String]!
+   ❌ null
+   ✅ []
+   ✅ ["Math", "Physics"]
+   ✅ ["Math", null, "Physics"]
+
+3. teachers: [String!]!
+   ❌ null
+   ✅ []
+   ✅ ["Dr. Sharma", "Dr. Kumar"]
+   ❌ ["Dr. Sharma", null, "Dr. Kumar"]
+</pre>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Benefits of Strong Typing</h4>
+                    <ul>
+                        <li><strong>Early Error Detection:</strong> Catch type errors before running</li>
+                        <li><strong>Better IDE Support:</strong> Auto-complete and suggestions</li>
+                        <li><strong>Self-Documenting:</strong> Types describe the API</li>
+                        <li><strong>Validation:</strong> Automatic input validation</li>
+                        <li><strong>Confidence:</strong> Know exactly what you'll get</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 6. Introspection -->
+            <div id="introspection" class="section">
+                <h2>🔍 Introspection</h2>
+
+                <div class="concept-box">
+                    <h4>What is Introspection?</h4>
+                    <p><strong>Introspection</strong> is GraphQL's ability to <span class="highlight">describe itself</span>. You can query the GraphQL schema to find out what queries, mutations, and types are available!</p>
+                </div>
+
+                <h3>Why Introspection is Amazing</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">📖</div>
+                        <h4>Self-Documenting</h4>
+                        <p>API documents itself automatically</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🔧</div>
+                        <h4>Tool Building</h4>
+                        <p>GraphiQL, Playground use it</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">💡</div>
+                        <h4>Auto-complete</h4>
+                        <p>IDEs can suggest fields</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🧪</div>
+                        <h4>Testing</h4>
+                        <p>Generate test cases automatically</p>
+                    </div>
+                </div>
+
+                <h3>Introspection Queries</h3>
+
+                <div class="example-box">
+                    <h4>1. Get All Available Types</h4>
+                    <div class="code-block">
+<pre>
+query {
+  __schema {
+    types {
+      name
+      kind
+      description
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "__schema": {
+      "types": [
+        { "name": "Student", "kind": "OBJECT", "description": null },
+        { "name": "Department", "kind": "OBJECT", "description": null },
+        { "name": "String", "kind": "SCALAR", "description": null },
+        { "name": "Int", "kind": "SCALAR", "description": null },
+        { "name": "ID", "kind": "SCALAR", "description": null },
+        ...
+      ]
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>2. Get All Available Queries</h4>
+                    <div class="code-block">
+<pre>
+query {
+  __schema {
+    queryType {
+      name
+      fields {
+        name
+        description
+        type {
+          name
+        }
+      }
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "__schema": {
+      "queryType": {
+        "name": "Query",
+        "fields": [
+          {
+            "name": "student",
+            "description": "Get a single student by ID",
+            "type": { "name": "Student" }
+          },
+          {
+            "name": "students",
+            "description": "Get all students",
+            "type": { "name": null }
+          },
+          {
+            "name": "department",
+            "description": "Get a single department by ID",
+            "type": { "name": "Department" }
+          },
+          {
+            "name": "departments",
+            "description": "Get all departments",
+            "type": { "name": null }
+          }
+        ]
+      }
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>3. Get Fields of Student Type</h4>
+                    <div class="code-block">
+<pre>
+query {
+  __type(name: "Student") {
+    name
+    kind
+    fields {
+      name
+      type {
+        name
+        kind
+      }
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "__type": {
+      "name": "Student",
+      "kind": "OBJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": { "name": "ID", "kind": "SCALAR" }
+        },
+        {
+          "name": "name",
+          "type": { "name": "String", "kind": "SCALAR" }
+        },
+        {
+          "name": "email",
+          "type": { "name": "String", "kind": "SCALAR" }
+        },
+        {
+          "name": "rollNumber",
+          "type": { "name": "String", "kind": "SCALAR" }
+        },
+        {
+          "name": "age",
+          "type": { "name": "Int", "kind": "SCALAR" }
+        },
+        {
+          "name": "department",
+          "type": { "name": "Department", "kind": "OBJECT" }
+        }
+      ]
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>4. Get All Mutations</h4>
+                    <div class="code-block">
+<pre>
+query {
+  __schema {
+    mutationType {
+      name
+      fields {
+        name
+        description
+        args {
+          name
+          type {
+            name
+          }
+        }
+      }
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "__schema": {
+      "mutationType": {
+        "name": "Mutation",
+        "fields": [
+          {
+            "name": "addStudent",
+            "description": "Create a new student",
+            "args": [
+              { "name": "name", "type": { "name": "String" } },
+              { "name": "email", "type": { "name": "String" } },
+              { "name": "rollNumber", "type": { "name": "String" } },
+              { "name": "departmentId", "type": { "name": "ID" } }
+            ]
+          },
+          {
+            "name": "updateStudent",
+            "description": "Update an existing student",
+            "args": [
+              { "name": "id", "type": { "name": "ID" } },
+              { "name": "name", "type": { "name": "String" } }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>5. Check if Field is Required</h4>
+                    <div class="code-block">
+<pre>
+query {
+  __type(name: "Student") {
+    fields {
+      name
+      type {
+        kind
+        name
+        ofType {
+          kind
+          name
+        }
+      }
+    }
+  }
+}
+
+Response shows if field is NON_NULL (required):
+{
+  "data": {
+    "__type": {
+      "fields": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "NON_NULL",      ← Required!
+            "name": null,
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "ID"
+            }
+          }
+        },
+        {
+          "name": "age",
+          "type": {
+            "kind": "SCALAR",        ← Optional
+            "name": "Int",
+            "ofType": null
+          }
+        }
+      ]
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>Real-World Use: GraphiQL</h3>
+                <div class="info-box">
+                    <h4>How GraphiQL Uses Introspection</h4>
+                    <ul>
+                        <li><strong>Auto-complete:</strong> When you type, GraphiQL queries the schema to show available fields</li>
+                        <li><strong>Documentation:</strong> The "Docs" panel is built from introspection</li>
+                        <li><strong>Validation:</strong> Checks your query against the schema in real-time</li>
+                        <li><strong>Field Hints:</strong> Shows what type each field returns</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Benefits of Introspection</h4>
+                    <ul>
+                        <li><strong>No Manual Docs:</strong> Schema IS the documentation</li>
+                        <li><strong>Always Up-to-Date:</strong> Docs update with schema changes</li>
+                        <li><strong>Tool Friendly:</strong> Build powerful dev tools easily</li>
+                        <li><strong>Discoverability:</strong> Easy to explore the API</li>
+                        <li><strong>Type Safety:</strong> Tools can validate queries before sending</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ Security Note</h4>
+                    <p>In production, you might want to disable introspection for security reasons. However, it's extremely useful in development!</p>
+                </div>
+            </div>
+
+            <!-- 7. Libraries -->
+            <div id="libraries" class="section">
+                <h2>📚 GraphQL Libraries</h2>
+
+                <div class="concept-box">
+                    <h4>What are GraphQL Libraries?</h4>
+                    <p>Libraries are tools that help you build and use GraphQL APIs easily. There are libraries for <span class="highlight">servers</span> (backend) and <span class="highlight">clients</span> (frontend).</p>
+                </div>
+
+                <h3>Server-Side Libraries (Backend)</h3>
+
+                <div class="example-box">
+                    <h4>1. Apollo Server (Node.js) - Most Popular</h4>
+                    <div class="code-block">
+<pre>
+// Installation
+npm install apollo-server graphql
+
+// Usage
+const { ApolloServer, gql } = require('apollo-server');
+
+// Define schema
+const typeDefs = gql`
+  type Student {
+    id: ID!
+    name: String!
+    email: String!
+  }
+
+  type Query {
+    students: [Student]
+  }
+`;
+
+// Define resolvers
+const resolvers = {
+  Query: {
+    students: () => {
+      return [
+        { id: '1', name: 'Ravi Kumar', email: 'ravi@example.com' },
+        { id: '2', name: 'Priya Sharma', email: 'priya@example.com' }
+      ];
+    }
+  }
+};
+
+// Create server
+const server = new ApolloServer({ typeDefs, resolvers });
+
+// Start server
+server.listen(4000).then(({ url }) => {
+  console.log(`Server ready at ${url}`);
+});
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>2. Express-GraphQL (Node.js + Express)</h4>
+                    <div class="code-block">
+<pre>
+// Installation
+npm install express express-graphql graphql
+
+// Usage
+const express = require('express');
+const { graphqlHTTP } = require('express-graphql');
+const { buildSchema } = require('graphql');
+
+const app = express();
+
+// Define schema
+const schema = buildSchema(`
+  type Student {
+    id: ID!
+    name: String!
+    email: String!
+  }
+
+  type Query {
+    students: [Student]
+  }
+`);
+
+// Define resolvers
+const root = {
+  students: () => {
+    return [
+      { id: '1', name: 'Ravi Kumar', email: 'ravi@example.com' },
+      { id: '2', name: 'Priya Sharma', email: 'priya@example.com' }
+    ];
+  }
+};
+
+// Setup endpoint
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true  // Enable GraphiQL UI
+}));
+
+app.listen(4000, () => {
+  console.log('Server running on http://localhost:4000/graphql');
+});
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>3. GraphQL Yoga (Node.js) - Easy Setup</h4>
+                    <div class="code-block">
+<pre>
+// Installation
+npm install graphql-yoga
+
+// Usage
+const { createServer } = require('graphql-yoga');
+
+const typeDefs = `
+  type Student {
+    id: ID!
+    name: String!
+    email: String!
+  }
+
+  type Query {
+    students: [Student]
+  }
+`;
+
+const resolvers = {
+  Query: {
+    students: () => [
+      { id: '1', name: 'Ravi Kumar', email: 'ravi@example.com' }
+    ]
+  }
+};
+
+const server = createServer({
+  schema: {
+    typeDefs,
+    resolvers
+  }
+});
+
+server.start(() => console.log('Server running on http://localhost:4000'));
+</pre>
+                    </div>
+                </div>
+
+                <h3>Client-Side Libraries (Frontend)</h3>
+
+                <div class="example-box">
+                    <h4>1. Apollo Client (React) - Most Popular</h4>
+                    <div class="code-block">
+<pre>
+// Installation
+npm install @apollo/client graphql
+
+// Setup (index.js or App.js)
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+
+// Create client
+const client = new ApolloClient({
+  uri: 'http://localhost:4000/graphql',
+  cache: new InMemoryCache()
+});
+
+// Wrap app
+function App() {
+  return (
+    &lt;ApolloProvider client={client}&gt;
+      &lt;StudentList /&gt;
+    &lt;/ApolloProvider&gt;
+  );
+}
+
+// Use in component
+import { useQuery } from '@apollo/client';
+
+const GET_STUDENTS = gql`
+  query {
+    students {
+      id
+      name
+      email
+    }
+  }
+`;
+
+function StudentList() {
+  const { loading, error, data } = useQuery(GET_STUDENTS);
+
+  if (loading) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (error) return &lt;p&gt;Error: {error.message}&lt;/p&gt;;
+
+  return (
+    &lt;ul&gt;
+      {data.students.map(student =&gt; (
+        &lt;li key={student.id}&gt;
+          {student.name} - {student.email}
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>2. Using fetch() - No Library Needed</h4>
+                    <div class="code-block">
+<pre>
+// Simple fetch example
+async function getStudents() {
+  const query = `
+    query {
+      students {
+        id
+        name
+        email
+      }
+    }
+  `;
+
+  const response = await fetch('http://localhost:4000/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query })
+  });
+
+  const result = await response.json();
+  console.log(result.data.students);
+}
+
+// Create student
+async function createStudent(name, email) {
+  const mutation = `
+    mutation {
+      addStudent(name: "${name}", email: "${email}") {
+        id
+        name
+        email
+      }
+    }
+  `;
+
+  const response = await fetch('http://localhost:4000/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query: mutation })
+  });
+
+  const result = await response.json();
+  return result.data.addStudent;
+}
+
+// Usage
+getStudents();
+createStudent('Ravi Kumar', 'ravi@example.com');
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>3. URQL (React) - Lightweight Alternative</h4>
+                    <div class="code-block">
+<pre>
+// Installation
+npm install urql graphql
+
+// Setup
+import { createClient, Provider, useQuery } from 'urql';
+
+const client = createClient({
+  url: 'http://localhost:4000/graphql'
+});
+
+function App() {
+  return (
+    &lt;Provider value={client}&gt;
+      &lt;StudentList /&gt;
+    &lt;/Provider&gt;
+  );
+}
+
+// Use in component
+const GET_STUDENTS = `
+  query {
+    students {
+      id
+      name
+      email
+    }
+  }
+`;
+
+function StudentList() {
+  const [result] = useQuery({ query: GET_STUDENTS });
+
+  const { data, fetching, error } = result;
+
+  if (fetching) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (error) return &lt;p&gt;Error!&lt;/p&gt;;
+
+  return (
+    &lt;ul&gt;
+      {data.students.map(student =&gt; (
+        &lt;li key={student.id}&gt;{student.name}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>Popular Tools</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">🎮</div>
+                        <h4>GraphiQL</h4>
+                        <p>Interactive GraphQL IDE<br>Built into most servers</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🚀</div>
+                        <h4>GraphQL Playground</h4>
+                        <p>Advanced GraphQL IDE<br>Better than GraphiQL</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📱</div>
+                        <h4>Apollo Studio</h4>
+                        <p>GraphQL dev platform<br>Schema registry, monitoring</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🔧</div>
+                        <h4>Postman</h4>
+                        <p>API testing tool<br>Supports GraphQL</p>
+                    </div>
+                </div>
+
+                <h3>Library Comparison</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Library</th>
+                        <th>Type</th>
+                        <th>Best For</th>
+                        <th>Difficulty</th>
+                    </tr>
+                    <tr>
+                        <td>Apollo Server</td>
+                        <td>Server</td>
+                        <td>Production apps, full features</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Express-GraphQL</td>
+                        <td>Server</td>
+                        <td>Existing Express apps</td>
+                        <td>Easy</td>
+                    </tr>
+                    <tr>
+                        <td>GraphQL Yoga</td>
+                        <td>Server</td>
+                        <td>Quick setup, beginners</td>
+                        <td>Easy</td>
+                    </tr>
+                    <tr>
+                        <td>Apollo Client</td>
+                        <td>Client</td>
+                        <td>React apps, caching needed</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>URQL</td>
+                        <td>Client</td>
+                        <td>Lightweight React apps</td>
+                        <td>Easy</td>
+                    </tr>
+                    <tr>
+                        <td>fetch()</td>
+                        <td>Client</td>
+                        <td>Simple apps, no dependencies</td>
+                        <td>Very Easy</td>
+                    </tr>
+                </table>
+
+                <div class="success-box">
+                    <h4>✅ Recommended Stack for Students</h4>
+                    <ul>
+                        <li><strong>Backend:</strong> Express-GraphQL (easy to learn, integrates with Express)</li>
+                        <li><strong>Frontend:</strong> fetch() or Apollo Client (start simple, upgrade later)</li>
+                        <li><strong>Testing:</strong> GraphiQL (comes free with most servers)</li>
+                        <li><strong>Database:</strong> MongoDB with Mongoose</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 8. Schema File -->
+            <div id="schema" class="section">
+                <h2>📄 GraphQL Schema File</h2>
+
+                <div class="concept-box">
+                    <h4>What is a Schema File?</h4>
+                    <p>The <strong>Schema</strong> is the blueprint of your GraphQL API. It defines all types, queries, mutations, and relationships in your application.</p>
+                </div>
+
+                <h3>Complete Student-Department Schema</h3>
+                <div class="example-box">
+                    <h4>schema.graphql (or schema.js)</h4>
+                    <div class="code-block">
+<pre>
+# ========================================
+# SCALAR TYPES (Built-in)
+# ========================================
+# String, Int, Float, Boolean, ID
+
+# ========================================
+# OBJECT TYPES
+# ========================================
+
+type Student {
+  id: ID!
+  name: String!
+  email: String!
+  rollNumber: String!
+  age: Int
+  phone: String
+  department: Department!    # Relationship to Department
+  createdAt: String
+  updatedAt: String
+}
+
+type Department {
+  id: ID!
+  name: String!
+  code: String!
+  hod: String!
+  building: String
+  students: [Student]        # Reverse relationship
+  createdAt: String
+  updatedAt: String
+}
+
+# ========================================
+# INPUT TYPES (for mutations)
+# ========================================
+
+input StudentInput {
+  name: String!
+  email: String!
+  rollNumber: String!
+  age: Int
+  phone: String
+  departmentId: ID!
+}
+
+input DepartmentInput {
+  name: String!
+  code: String!
+  hod: String!
+  building: String
+}
+
+# ========================================
+# QUERY TYPE (Read Operations)
+# ========================================
+
+type Query {
+  # Get single student by ID
+  student(id: ID!): Student
+  
+  # Get all students
+  students: [Student]
+  
+  # Search students by name
+  searchStudents(name: String!): [Student]
+  
+  # Get students by department
+  studentsByDepartment(departmentId: ID!): [Student]
+  
+  # Get single department
+  department(id: ID!): Department
+  
+  # Get all departments
+  departments: [Department]
+}
+
+# ========================================
+# MUTATION TYPE (Write Operations)
+# ========================================
+
+type Mutation {
+  # Student operations
+  addStudent(input: StudentInput!): Student
+  updateStudent(id: ID!, name: String, email: String, age: Int, phone: String): Student
+  deleteStudent(id: ID!): Student
+  
+  # Department operations
+  addDepartment(input: DepartmentInput!): Department
+  updateDepartment(id: ID!, hod: String, building: String): Department
+  deleteDepartment(id: ID!): Department
+}
+
+# ========================================
+# ROOT SCHEMA
+# ========================================
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>Schema Components Explained</h3>
+
+                <div class="step-card">
+                    <span class="step-number">1</span>
+                    <strong>Object Types</strong>
+                    <p>Define the shape of your data</p>
+                    <div class="code-block">
+<pre>
+type Student {
+  id: ID!           # Field name: Field type
+  name: String!     # ! means required
+  age: Int          # No ! means optional
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">2</span>
+                    <strong>Relationships</strong>
+                    <p>Connect types together</p>
+                    <div class="code-block">
+<pre>
+type Student {
+  department: Department!    # Student has one Department
+}
+
+type Department {
+  students: [Student]        # Department has many Students
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">3</span>
+                    <strong>Input Types</strong>
+                    <p>For passing complex data to mutations</p>
+                    <div class="code-block">
+<pre>
+input StudentInput {
+  name: String!
+  email: String!
+  departmentId: ID!
+}
+
+type Mutation {
+  addStudent(input: StudentInput!): Student
+}
+
+# Usage:
+mutation {
+  addStudent(input: {
+    name: "Ravi"
+    email: "ravi@example.com"
+    departmentId: "101"
+  }) {
+    id
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">4</span>
+                    <strong>Query Type</strong>
+                    <p>All available read operations</p>
+                    <div class="code-block">
+<pre>
+type Query {
+  students: [Student]              # Get list
+  student(id: ID!): Student        # Get one by ID
+  searchStudents(name: String): [Student]  # Search
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">5</span>
+                    <strong>Mutation Type</strong>
+                    <p>All available write operations</p>
+                    <div class="code-block">
+<pre>
+type Mutation {
+  addStudent(name: String!, email: String!): Student      # Create
+  updateStudent(id: ID!, name: String): Student           # Update
+  deleteStudent(id: ID!): Student                         # Delete
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>Implementing Schema in Code</h3>
+                <div class="example-box">
+                    <h4>Method 1: Using GraphQL Schema Language (Recommended)</h4>
+                    <div class="code-block">
+<pre>
+const { buildSchema } = require('graphql');
+
+const schema = buildSchema(`
+  type Student {
+    id: ID!
+    name: String!
+    email: String!
+  }
+
+  type Query {
+    students: [Student]
+  }
+`);
+
+module.exports = schema;
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>Method 2: Using GraphQL.js Objects</h4>
+                    <div class="code-block">
+<pre>
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLID,
+  GraphQLList,
+  GraphQLSchema
+} = require('graphql');
+
+const StudentType = new GraphQLObjectType({
+  name: 'Student',
+  fields: () => ({
+    id: { type: GraphQLID },
+    name: { type: GraphQLString },
+    email: { type: GraphQLString }
+  })
+});
+
+const RootQuery = new GraphQLObjectType({
+  name: 'RootQueryType',
+  fields: {
+    students: {
+      type: new GraphQLList(StudentType),
+      resolve(parent, args) {
+        // Return students from database
+        return students;
+      }
+    }
+  }
+});
+
+module.exports = new GraphQLSchema({
+  query: RootQuery
+});
+</pre>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>📝 Schema Best Practices</h4>
+                    <ul>
+                        <li><strong>Use descriptive names:</strong> <code>student</code> vs <code>s</code></li>
+                        <li><strong>Mark required fields:</strong> Use <code>!</code> for non-null</li>
+                        <li><strong>Group related types:</strong> Keep Student fields together</li>
+                        <li><strong>Use Input types:</strong> For complex mutation arguments</li>
+                        <li><strong>Document your schema:</strong> Add descriptions with <code>""" """</code></li>
+                    </ul>
+                </div>
+
+                <div class="example-box">
+                    <h4>Schema with Descriptions</h4>
+                    <div class="code-block">
+<pre>
+"""
+Represents a student in the system
+"""
+type Student {
+  "Unique identifier for the student"
+  id: ID!
+  
+  "Full name of the student"
+  name: String!
+  
+  "Email address for communication"
+  email: String!
+  
+  "Department the student belongs to"
+  department: Department!
+}
+
+type Query {
+  """
+  Get a single student by their ID
+  Returns null if student not found
+  """
+  student(id: ID!): Student
+  
+  """
+  Get all students in the system
+  Returns empty array if no students exist
+  """
+  students: [Student]
+}
+</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. List API -->
+            <div id="list-api" class="section">
+                <h2>📋 List API & Integration</h2>
+
+                <div class="concept-box">
+                    <h4>What is List API?</h4>
+                    <p>A <strong>List API</strong> is a query that returns multiple items (array/list) instead of a single item. It's one of the most common operations in GraphQL.</p>
+                </div>
+
+                <h3>Defining List Queries in Schema</h3>
+                <div class="example-box">
+                    <h4>Schema Definition</h4>
+                    <div class="code-block">
+<pre>
+type Query {
+  # Returns array of Students
+  students: [Student]
+  
+  # Returns array of Departments
+  departments: [Department]
+  
+  # Returns array of Students (non-null list)
+  activeStudents: [Student]!
+  
+  # Returns array where items cannot be null
+  verifiedStudents: [Student!]!
+}
+
+Explanation:
+[Student]      → Can be null, can be empty [], can have null items
+[Student]!     → Cannot be null, can be empty [], can have null items
+[Student!]     → Can be null, can be empty [], items cannot be null
+[Student!]!    → Cannot be null, cannot have null items (strict)
+</pre>
+                    </div>
+                </div>
+
+                <h3>Implementing List Resolvers</h3>
+                <div class="example-box">
+                    <h4>Backend Implementation (Node.js + MongoDB)</h4>
+                    <div class="code-block">
+<pre>
+const Student = require('./models/Student');
+const Department = require('./models/Department');
+
+const resolvers = {
+  Query: {
+    // Get all students
+    students: async () => {
+      try {
+        const students = await Student.find({});
+        return students;
+      } catch (error) {
+        throw new Error('Failed to fetch students');
+      }
+    },
+    
+    // Get all departments
+    departments: async () => {
+      try {
+        const departments = await Department.find({});
+        return departments;
+      } catch (error) {
+        throw new Error('Failed to fetch departments');
+      }
+    },
+    
+    // Get students with filters
+    searchStudents: async (parent, args) => {
+      try {
+        const { name } = args;
+        const students = await Student.find({
+          name: { $regex: name, $options: 'i' }  // Case-insensitive search
+        });
+        return students;
+      } catch (error) {
+        throw new Error('Search failed');
+      }
+    },
+    
+    // Get students by department
+    studentsByDepartment: async (parent, args) => {
+      try {
+        const { departmentId } = args;
+        const students = await Student.find({ department: departmentId });
+        return students;
+      } catch (error) {
+        throw new Error('Failed to fetch students');
+      }
+    }
+  }
+};
+
+module.exports = resolvers;
+</pre>
+                    </div>
+                </div>
+
+                <h3>List API Queries</h3>
+
+                <div class="step-card">
+                    <span class="step-number">1</span>
+                    <strong>Get All Students</strong>
+                    <div class="code-block">
+<pre>
+query {
+  students {
+    id
+    name
+    email
+    rollNumber
+  }
+}
+
+Response:
+{
+  "data": {
+    "students": [
+      {
+        "id": "1",
+        "name": "Ravi Kumar",
+        "email": "ravi@example.com",
+        "rollNumber": "BCA001"
+      },
+      {
+        "id": "2",
+        "name": "Priya Sharma",
+        "email": "priya@example.com",
+        "rollNumber": "BCA002"
+      },
+      {
+        "id": "3",
+        "name": "Kiran Reddy",
+        "email": "kiran@example.com",
+        "rollNumber": "BCA003"
+      }
+    ]
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">2</span>
+                    <strong>Get All Departments</strong>
+                    <div class="code-block">
+<pre>
+query {
+  departments {
+    id
+    name
+    code
+    hod
+    building
+  }
+}
+
+Response:
+{
+  "data": {
+    "departments": [
+      {
+        "id": "101",
+        "name": "Computer Applications",
+        "code": "BCA",
+        "hod": "Dr. Rama Krishna",
+        "building": "Block A"
+      },
+      {
+        "id": "102",
+        "name": "Computer Science",
+        "code": "CSE",
+        "hod": "Dr. Sharma",
+        "building": "Block B"
+      }
+    ]
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">3</span>
+                    <strong>Get Students with Nested Department</strong>
+                    <div class="code-block">
+<pre>
+query {
+  students {
+    id
+    name
+    email
+    department {          ← Nested relationship
+      name
+      code
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "students": [
+      {
+        "id": "1",
+        "name": "Ravi Kumar",
+        "email": "ravi@example.com",
+        "department": {
+          "name": "Computer Applications",
+          "code": "BCA"
+        }
+      },
+      {
+        "id": "2",
+        "name": "Priya Sharma",
+        "email": "priya@example.com",
+        "department": {
+          "name": "Computer Applications",
+          "code": "BCA"
+        }
+      }
+    ]
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>List API Integration (Frontend)</h3>
+
+                <div class="example-box">
+                    <h4>React Component with fetch()</h4>
+                    <div class="code-block">
+<pre>
+import React, { useState, useEffect } from 'react';
+
+function StudentList() {
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    const query = `
+      query {
+        students {
+          id
+          name
+          email
+          rollNumber
+          department {
+            name
+            code
+          }
+        }
+      }
+    `;
+
+    try {
+      const response = await fetch('http://localhost:4000/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query })
+      });
+
+      const result = await response.json();
+      
+      if (result.errors) {
+        setError(result.errors[0].message);
+      } else {
+        setStudents(result.data.students);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return &lt;div&gt;Loading students...&lt;/div&gt;;
+  if (error) return &lt;div&gt;Error: {error}&lt;/div&gt;;
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Students List&lt;/h2&gt;
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Roll Number&lt;/th&gt;
+            &lt;th&gt;Name&lt;/th&gt;
+            &lt;th&gt;Email&lt;/th&gt;
+            &lt;th&gt;Department&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {students.map(student => (
+            &lt;tr key={student.id}&gt;
+              &lt;td&gt;{student.rollNumber}&lt;/td&gt;
+              &lt;td&gt;{student.name}&lt;/td&gt;
+              &lt;td&gt;{student.email}&lt;/td&gt;
+              &lt;td&gt;{student.department.name} ({student.department.code})&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default StudentList;
+</pre>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>React Component with Apollo Client</h4>
+                    <div class="code-block">
+<pre>
+import { useQuery, gql } from '@apollo/client';
+
+const GET_STUDENTS = gql`
+  query {
+    students {
+      id
+      name
+      email
+      rollNumber
+      department {
+        name
+        code
+      }
+    }
+  }
+`;
+
+function StudentList() {
+  const { loading, error, data } = useQuery(GET_STUDENTS);
+
+  if (loading) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (error) return &lt;p&gt;Error: {error.message}&lt;/p&gt;;
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Students ({data.students.length})&lt;/h2&gt;
+      &lt;ul&gt;
+        {data.students.map(student => (
+          &lt;li key={student.id}&gt;
+            &lt;strong&gt;{student.name}&lt;/strong&gt; ({student.rollNumber})
+            &lt;br /&gt;
+            Email: {student.email}
+            &lt;br /&gt;
+            Department: {student.department.name}
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default StudentList;
+</pre>
+                    </div>
+                </div>
+
+                <h3>Filtering and Pagination</h3>
+                <div class="example-box">
+                    <h4>Enhanced List Query with Filters</h4>
+                    <div class="code-block">
+<pre>
+# Schema
+type Query {
+  students(
+    limit: Int
+    offset: Int
+    department: String
+    search: String
+  ): [Student]
+}
+
+# Query with filters
+query {
+  students(
+    limit: 10
+    offset: 0
+    department: "BCA"
+    search: "Kumar"
+  ) {
+    id
+    name
+    email
+  }
+}
+
+# Resolver
+students: async (parent, args) => {
+  const { limit = 10, offset = 0, department, search } = args;
+  
+  let filter = {};
+  if (department) filter.department = department;
+  if (search) filter.name = { $regex: search, $options: 'i' };
+  
+  return await Student.find(filter)
+    .limit(limit)
+    .skip(offset);
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ List API Best Practices</h4>
+                    <ul>
+                        <li><strong>Always paginate:</strong> Don't return millions of records</li>
+                        <li><strong>Add filters:</strong> Let clients filter data server-side</li>
+                        <li><strong>Handle empty lists:</strong> Return [] not null</li>
+                        <li><strong>Include counts:</strong> Return total count for pagination</li>
+                        <li><strong>Error handling:</strong> Gracefully handle database errors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 10. Create API -->
+            <div id="create-api" class="section">
+                <h2>✏️ Create API & Integration</h2>
+
+                <div class="concept-box">
+                    <h4>What is Create API?</h4>
+                    <p>A <strong>Create API</strong> is a mutation that adds new data to the system. It's how you create new students, departments, or any other records.</p>
+                </div>
+
+                <h3>Defining Create Mutations in Schema</h3>
+                <div class="example-box">
+                    <h4>Schema Definition</h4>
+                    <div class="code-block">
+<pre>
+# Input type for creating student
+input StudentInput {
+  name: String!
+  email: String!
+  rollNumber: String!
+  age: Int
+  phone: String
+  departmentId: ID!
+}
+
+# Input type for creating department
+input DepartmentInput {
+  name: String!
+  code: String!
+  hod: String!
+  building: String
+}
+
+type Mutation {
+  # Create new student
+  addStudent(input: StudentInput!): Student
+  
+  # Alternative: Without input type
+  createStudent(
+    name: String!
+    email: String!
+    rollNumber: String!
+    age: Int
+    phone: String
+    departmentId: ID!
+  ): Student
+  
+  # Create new department
+  addDepartment(input: DepartmentInput!): Department
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>Implementing Create Resolvers</h3>
+                <div class="example-box">
+                    <h4>Backend Implementation (Node.js + MongoDB)</h4>
+                    <div class="code-block">
+<pre>
+const Student = require('./models/Student');
+const Department = require('./models/Department');
+
+const resolvers = {
+  Mutation: {
+    // Create new student
+    addStudent: async (parent, args) => {
+      try {
+        const { input } = args;
+        
+        // Validate department exists
+        const department = await Department.findById(input.departmentId);
+        if (!department) {
+          throw new Error('Department not found');
+        }
+        
+        // Check if email already exists
+        const existingStudent = await Student.findOne({ email: input.email });
+        if (existingStudent) {
+          throw new Error('Email already registered');
+        }
+        
+        // Create new student
+        const student = new Student({
+          name: input.name,
+          email: input.email,
+          rollNumber: input.rollNumber,
+          age: input.age,
+          phone: input.phone,
+          department: input.departmentId
+        });
+        
+        // Save to database
+        const savedStudent = await student.save();
+        
+        return savedStudent;
+      } catch (error) {
+        throw new Error(`Failed to create student: ${error.message}`);
+      }
+    },
+    
+    // Create new department
+    addDepartment: async (parent, args) => {
+      try {
+        const { input } = args;
+        
+        // Check if code already exists
+        const existingDept = await Department.findOne({ code: input.code });
+        if (existingDept) {
+          throw new Error('Department code already exists');
+        }
+        
+        // Create new department
+        const department = new Department({
+          name: input.name,
+          code: input.code,
+          hod: input.hod,
+          building: input.building
+        });
+        
+        // Save to database
+        const savedDepartment = await department.save();
+        
+        return savedDepartment;
+      } catch (error) {
+        throw new Error(`Failed to create department: ${error.message}`);
+      }
+    }
+  }
+};
+
+module.exports = resolvers;
+</pre>
+                    </div>
+                </div>
+
+                <h3>Create Mutation Examples</h3>
+
+                <div class="step-card">
+                    <span class="step-number">1</span>
+                    <strong>Create Student (Simple)</strong>
+                    <div class="code-block">
+<pre>
+mutation {
+  addStudent(input: {
+    name: "Ravi Kumar"
+    email: "ravi@example.com"
+    rollNumber: "BCA001"
+    age: 20
+    phone: "9876543210"
+    departmentId: "101"
+  }) {
+    id
+    name
+    email
+    rollNumber
+  }
+}
+
+Response:
+{
+  "data": {
+    "addStudent": {
+      "id": "1",
+      "name": "Ravi Kumar",
+      "email": "ravi@example.com",
+      "rollNumber": "BCA001"
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">2</span>
+                    <strong>Create Student with Department Details</strong>
+                    <div class="code-block">
+<pre>
+mutation {
+  addStudent(input: {
+    name: "Priya Sharma"
+    email: "priya@example.com"
+    rollNumber: "BCA002"
+    age: 19
+    departmentId: "101"
+  }) {
+    id
+    name
+    email
+    department {          ← Get created student with department
+      name
+      code
+      hod
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "addStudent": {
+      "id": "2",
+      "name": "Priya Sharma",
+      "email": "priya@example.com",
+      "department": {
+        "name": "Computer Applications",
+        "code": "BCA",
+        "hod": "Dr. Rama Krishna"
+      }
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">3</span>
+                    <strong>Create Department</strong>
+                    <div class="code-block">
+<pre>
+mutation {
+  addDepartment(input: {
+    name: "Computer Applications"
+    code: "BCA"
+    hod: "Dr. Rama Krishna"
+    building: "Block A"
+  }) {
+    id
+    name
+    code
+    hod
+    building
+  }
+}
+
+Response:
+{
+  "data": {
+    "addDepartment": {
+      "id": "101",
+      "name": "Computer Applications",
+      "code": "BCA",
+      "hod": "Dr. Rama Krishna",
+      "building": "Block A"
+    }
+  }
+}
+</pre>
+                    </div>
+                </div>
+
+                <h3>Create API Integration (Frontend)</h3>
+
+                <div class="example-box">
+                    <h4>React Form with fetch()</h4>
+                    <div class="code-block">
+<pre>
+import React, { useState } from 'react';
+
+function AddStudentForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    rollNumber: '',
+    age: '',
+    phone: '',
+    departmentId: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+const handleSubmit = async (e) => {
+e.preventDefault();
+setLoading(true);
+setError(null);
+setSuccess(false);
+const mutation = `
+  mutation AddStudent($input: StudentInput!) {
+    addStudent(input: $input) {
+      id
+      name
+      email
+      rollNumber
+      department {
+        name
+        code
+      }
+    }
+  }
+`;
+const mutation = `
+  mutation AddStudent($input: StudentInput!) {
+    addStudent(input: $input) {
+      id
+      name
+      email
+      rollNumber
+      department {
+        name
+        code
+      }
+    }
+  }
+`;const variables = {
+  input: {
+    name: formData.name,
+    email: formData.email,
+    rollNumber: formData.rollNumber,
+    age: parseInt(formData.age) || null,
+    phone: formData.phone,
+    departmentId: formData.departmentId
+  }
+};try {
+  const response = await fetch('http://localhost:4000/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query: mutation, variables })
+  });  const result = await response.json();  if (result.errors) {
+    setError(result.errors[0].message);
+  } else {
+    setSuccess(true);
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      rollNumber: '',
+      age: '',
+      phone: '',
+      departmentId: ''
+    });
+    alert('Student created successfully!');
+  }
+} catch (err) {
+  setError(err.message);
+} finally {
+  setLoading(false);
+}
+};return (
+<div>
+<h2>Add New Student</h2>  {error && &lt;div style={{color: 'red'}}&gt;Error: {error}&lt;/div&gt;}
+  {success && &lt;div style={{color: 'green'}}&gt;Student added successfully!&lt;/div&gt;}  &lt;form onSubmit={handleSubmit}&gt;
+    &lt;div&gt;
+      &lt;label&gt;Name:&lt;/label&gt;
+      &lt;input
+        type="text"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        required
+      /&gt;
+    &lt;/div&gt;    &lt;div&gt;
+      &lt;label&gt;Email:&lt;/label&gt;
+      &lt;input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        required
+      /&gt;
+    &lt;/div&gt;    &lt;div&gt;
+      &lt;label&gt;Roll Number:&lt;/label&gt;
+      &lt;input
+        type="text"
+        name="rollNumber"
+        value={formData.rollNumber}
+        onChange={handleChange}
+        required
+      /&gt;
+    &lt;/div&gt;    &lt;div&gt;
+      &lt;label&gt;Age:&lt;/label&gt;
+      &lt;input
+        type="number"
+        name="age"
+        value={formData.age}
+        onChange={handleChange}
+      /&gt;
+    &lt;/div&gt;    &lt;div&gt;
+      &lt;label&gt;Phone:&lt;/label&gt;
+      &lt;input
+        type="tel"
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+      /&gt;
+    &lt;/div&gt;    &lt;div&gt;
+      &lt;label&gt;Department ID:&lt;/label&gt;
+      &lt;input
+        type="text"
+        name="departmentId"
+        value={formData.departmentId}
+        onChange={handleChange}
+        required
+      /&gt;
+    &lt;/div&gt;    &lt;button type="submit" disabled={loading}&gt;
+      {loading ? 'Creating...' : 'Add Student'}
+    &lt;/button&gt;
+  &lt;/form&gt;
+&lt;/div&gt;
+);
+}export default AddStudentForm;
+</pre>
+</div>
+</div>            <div class="example-box">
+                <h4>React Form with Apollo Client</h4>
+                <div class="code-block">
+<pre>
+import { useMutation, gql } from '@apollo/client';
+import { useState } from 'react';const ADD_STUDENT = gql  mutation AddStudent($input: StudentInput!) {     addStudent(input: $input) {       id       name       email       rollNumber       department {         name         code       }     }   };function AddStudentForm() {
+const [formData, setFormData] = useState({
+name: '',
+email: '',
+rollNumber: '',
+age: '',
+phone: '',
+departmentId: ''
+});const [addStudent, { loading, error }] = useMutation(ADD_STUDENT, {
+onCompleted: (data) => {
+alert(Student ${data.addStudent.name} created successfully!);
+// Reset form
+setFormData({
+name: '',
+email: '',
+rollNumber: '',
+age: '',
+phone: '',
+departmentId: ''
+});
+}
+});const handleSubmit = (e) => {
+e.preventDefault();addStudent({
+  variables: {
+    input: {
+      name: formData.name,
+      email: formData.email,
+      rollNumber: formData.rollNumber,
+      age: parseInt(formData.age) || null,
+      phone: formData.phone,
+      departmentId: formData.departmentId
+    }
+  }
+});
+};return (
+<div>
+<h2>Add New Student</h2>  {error && &lt;div style={{color: 'red'}}&gt;Error: {error.message}&lt;/div&gt;}  &lt;form onSubmit={handleSubmit}&gt;
+    {/* Form fields same as above */}    &lt;button type="submit" disabled={loading}&gt;
+      {loading ? 'Creating...' : 'Add Student'}
+    &lt;/button&gt;
+  &lt;/form&gt;
+&lt;/div&gt;
+);
+}export default AddStudentForm;
+</pre>
+</div>
+</div>            <div class="success-box">
+                <h4>✅ Create API Best Practices</h4>
+                <ul>
+                    <li><strong>Use Input Types:</strong> Cleaner and reusable</li>
+                    <li><strong>Validate Data:</strong> Check required fields and formats</li>
+                    <li><strong>Check Duplicates:</strong> Prevent duplicate emails, codes, etc.</li>
+                    <li><strong>Return Created Object:</strong> Send back what was created</li>
+                    <li><strong>Handle Errors:</strong> Provide clear error messages</li>
+                </ul>
+            </div>
+        </div>        <!-- 11. Query Variables -->
+        <div id="variables" class="section">
+            <h2>🔧 Query Variables</h2>            <div class="concept-box">
+                <h4>What are Query Variables?</h4>
+                <p><strong>Query Variables</strong> allow you to pass dynamic values to your queries and mutations separately from the query string. This is the <span class="highlight">recommended way</span> to send data!</p>
+            </div>            <h3>Why Use Variables?</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">🔒</div>
+                    <h4>Security</h4>
+                    <p>Prevents injection attacks</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">♻️</div>
+                    <h4>Reusability</h4>
+                    <p>Same query, different values</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">✅</div>
+                    <h4>Type Safety</h4>
+                    <p>Variables are typed</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📝</div>
+                    <h4>Readability</h4>
+                    <p>Cleaner code</p>
+                </div>
+            </div>            <h3>Without Variables (Bad Practice)</h3>
+            <div class="example-box">
+                <h4>❌ Hardcoded Values - Not Recommended</h4>
+                <div class="code-block">
+<pre>
+// Every time you need different data, you create a new query string
+mutation {
+  addStudent(input: {
+    name: "Ravi Kumar"
+    email: "ravi@example.com"
+    rollNumber: "BCA001"
+    age: 20
+    departmentId: "101"
+  }) {
+    id
+    name
+  }
+}Problems:
+❌ Cannot reuse the query
+❌ Must build query string for each call
+❌ Vulnerable to injection attacks
+❌ Hard to maintain
+</pre>
+</div>
+</div>            <h3>With Variables (Best Practice)</h3>
+            <div class="example-box">
+                <h4>✅ Using Variables - Recommended</h4>
+                <div class="code-block">
+<pre>
+// Define the mutation with variables
+mutation AddStudent($input: StudentInput!) {
+  addStudent(input: $input) {
+    id
+    name
+    email
+    department {
+      name
+    }
+  }
+}// Separate variables object (JSON)
+{
+"input": {
+"name": "Ravi Kumar",
+"email": "ravi@example.com",
+"rollNumber": "BCA001",
+"age": 20,
+"departmentId": "101"
+}
+}Benefits:
+✅ Query is reusable
+✅ Variables are typed and validated
+✅ Safer against injection
+✅ Cleaner and more maintainable
+</pre>
+</div>
+</div>            <h3>Variable Syntax</h3>
+            <div class="info-box">
+                <h4>Variable Declaration Format</h4>
+                <div class="code-block">
+<pre>
+query OperationName($variableName: Type!) {
+  field(argument: $variableName) {
+    subfield
+  }
+}Components:
+
+$ → Variable prefix (required)
+variableName → Variable name
+Type → Variable type (String, Int, ID, etc.)
+! → Required (optional)
+</pre>
+                  </div>
+              </div>
+
+            <h3>Query Variable Examples</h3>            <div class="step-card">
+                <span class="step-number">1</span>
+                <strong>Get Student by ID with Variable</strong>
+                <div class="code-block">
+<pre>
+# Query
+query GetStudent($id: ID!) {
+  student(id: $id) {
+    id
+    name
+    email
+    rollNumber
+    department {
+      name
+      code
+    }
+  }
+}Variables
+{
+"id": "1"
+}Response
+{
+"data": {
+"student": {
+"id": "1",
+"name": "Ravi Kumar",
+"email": "ravi@example.com",
+"rollNumber": "BCA001",
+"department": {
+"name": "Computer Applications",
+"code": "BCA"
+}
+}
+}
+}
+</pre>
+</div>
+</div>            <div class="step-card">
+                <span class="step-number">2</span>
+                <strong>Search Students with Variable</strong>
+                <div class="code-block">
+<pre>
+# Query
+query SearchStudents($searchTerm: String!) {
+  searchStudents(name: $searchTerm) {
+    id
+    name
+    email
+    rollNumber
+  }
+}Variables
+{
+"searchTerm": "Kumar"
+}Response
+{
+"data": {
+"searchStudents": [
+{
+"id": "1",
+"name": "Ravi Kumar",
+"email": "ravi@example.com",
+"rollNumber": "BCA001"
+},
+{
+"id": "5",
+"name": "Suresh Kumar",
+"email": "suresh@example.com",
+"rollNumber": "BCA005"
+}
+]
+}
+}
+</pre>
+</div>
+</div>            <div class="step-card">
+                <span class="step-number">3</span>
+                <strong>Create Student with Variables</strong>
+                <div class="code-block">
+<pre>
+# Mutation
+mutation CreateStudent(
+  $name: String!
+  $email: String!
+  $rollNumber: String!
+  $age: Int
+  $phone: String
+  $departmentId: ID!
+) {
+  addStudent(input: {
+    name: $name
+    email: $email
+    rollNumber: $rollNumber
+    age: $age
+    phone: $phone
+    departmentId: $departmentId
+  }) {
+    id
+    name
+    email
+    rollNumber
+  }
+}Variables
+{
+"name": "Anjali Verma",
+"email": "anjali@example.com",
+"rollNumber": "BCA004",
+"age": 20,
+"phone": "9876543213",
+"departmentId": "101"
+}
+</pre>
+</div>
+</div>            <div class="step-card">
+                <span class="step-number">4</span>
+                <strong>Update Student with Variables</strong>
+                <div class="code-block">
+<pre>
+# Mutation
+mutation UpdateStudent(
+  $id: ID!
+  $name: String
+  $age: Int
+  $phone: String
+) {
+  updateStudent(
+    id: $id
+    name: $name
+    age: $age
+    phone: $phone
+  ) {
+    id
+    name
+    email
+    age
+    phone
+  }
+}Variables
+{
+"id": "1",
+"name": "Ravi Kumar Updated",
+"age": 21,
+"phone": "9999999999"
+}
+</pre>
+</div>
+</div>            <div class="step-card">
+                <span class="step-number">5</span>
+                <strong>Multiple Variables</strong>
+                <div class="code-block">
+<pre>
+# Query
+query GetStudentAndDepartment(
+  $studentId: ID!
+  $departmentId: ID!
+) {
+  student(id: $studentId) {
+    id
+    name
+    email
+  }department(id: $departmentId) {
+id
+name
+code
+}
+}Variables
+{
+"studentId": "1",
+"departmentId": "101"
+}
+</pre>
+</div>
+</div>            <h3>Default Values for Variables</h3>
+            <div class="example-box">
+                <h4>Optional Variables with Defaults</h4>
+                <div class="code-block">
+<pre>
+# Query with default values
+query GetStudents(
+  $limit: Int = 10
+  $offset: Int = 0
+  $department: String = null
+) {
+  students(
+    limit: $limit
+    offset: $offset
+    department: $department
+  ) {
+    id
+    name
+    email
+  }
+}Call without variables (uses defaults)
+{
+// Empty - will use limit=10, offset=0, department=null
+}Call with partial variables
+{
+"limit": 5
+// offset will be 0, department will be null
+}Call with all variables
+{
+"limit": 20,
+"offset": 10,
+"department": "BCA"
+}
+</pre>
+</div>
+</div>            <h3>Using Variables in Code</h3>
+            <div class="example-box">
+                <h4>JavaScript/fetch() Example</h4>
+                <div class="code-block">
+<pre>
+async function getStudent(studentId) {
+  const query = `
+    query GetStudent($id: ID!) {
+      student(id: $id) {
+        id
+        name
+        email
+      }
+    }
+  `;const variables = {
+id: studentId
+};const response = await fetch('http://localhost:4000/graphql', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+},
+body: JSON.stringify({
+query: query,
+variables: variables
+})
+});const result = await response.json();
+return result.data.student;
+}// Usage
+const student = await getStudent("1");
+console.log(student);
+</pre>
+</div>
+</div>            <div class="example-box">
+                <h4>React with Apollo Client Example</h4>
+                <div class="code-block">
+<pre>
+import { useQuery, gql } from '@apollo/client';const GET_STUDENT = gql  query GetStudent($id: ID!) {     student(id: $id) {       id       name       email       department {         name       }     }   };function StudentDetail({ studentId }) {
+const { loading, error, data } = useQuery(GET_STUDENT, {
+variables: { id: studentId }
+});if (loading) return <p>Loading...</p>;
+if (error) return <p>Error: {error.message}</p>;return (
+<div>
+<h2>{data.student.name}</h2>
+<p>Email: {data.student.email}</p>
+<p>Department: {data.student.department.name}</p>
+</div>
+);
+}// Usage
+<StudentDetail studentId="1" />
+</pre>
+</div>
+</div>            <div class="success-box">
+                <h4>✅ Variable Best Practices</h4>
+                <ul>
+                    <li><strong>Always use variables:</strong> Never hardcode dynamic values</li>
+                    <li><strong>Name descriptively:</strong> Use clear variable names</li>
+                    <li><strong>Type correctly:</strong> Match schema types exactly</li>
+                    <li><strong>Mark required:</strong> Use ! for required variables</li>
+                    <li><strong>Provide defaults:</strong> For optional parameters</li>
+                </ul>
+            </div>
+        </div>        <!-- 12. Input Validations -->
+        <div id="validations" class="section">
+            <h2>✅ Input Validations</h2>            <div class="concept-box">
+                <h4>What is Input Validation?</h4>
+                <p><strong>Input Validation</strong> ensures that data sent to your API is correct, complete, and safe before processing. GraphQL provides multiple layers of validation!</p>
+            </div>            <h3>Types of Validation</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">1️⃣</div>
+                    <h4>Schema Validation</h4>
+                    <p>GraphQL automatically validates types</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">2️⃣</div>
+                    <h4>Required Fields</h4>
+                    <p>Using ! modifier</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">3️⃣</div>
+                    <h4>Custom Validation</h4>
+                    <p>In resolvers</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">4️⃣</div>
+                    <h4>Custom Scalars</h4>
+                    <p>Email, URL, etc.</p>
+                </div>
+            </div>            <h3>1. Schema-Level Validation (Automatic)</h3>
+            <div class="example-box">
+                <h4>Type Validation</h4>
+                <div class="code-block">
+<pre>
+# Schema
+type Mutation {
+  addStudent(
+    name: String!      # Must be String
+    email: String!     # Must be String
+    age: Int           # Must be Int (if provided)
+    departmentId: ID!  # Must be ID
+  ): Student
+}❌ Wrong type - GraphQL catches it
+mutation {
+addStudent(
+name: "Ravi"
+email: "ravi@example.com"
+age: "twenty"           ← String instead of Int
+departmentId: "101"
+) {
+id
+}
+}Error:
+{
+"errors": [{
+"message": "Int cannot represent non-integer value: "twenty"",
+"locations": [{"line": 5, "column": 10}]
+}]
+}✅ Correct types
+mutation {
+addStudent(
+name: "Ravi"
+email: "ravi@example.com"
+age: 20                 ← Correct Int
+departmentId: "101"
+) {
+id
+}
+}
+</pre>
+</div>
+</div>            <h3>2. Required Field Validation</h3>
+            <div class="example-box">
+                <h4>Non-Null Validation (using !)</h4>
+                <div class="code-block">
+<pre>
+# Schema
+input StudentInput {
+  name: String!          # Required
+  email: String!         # Required
+  rollNumber: String!    # Required
+  age: Int               # Optional
+  phone: String          # Optional
+  departmentId: ID!      # Required
+}❌ Missing required field
+mutation {
+addStudent(input: {
+email: "ravi@example.com"
+rollNumber: "BCA001"
+departmentId: "101"
+# Missing 'name' field
+}) {
+id
+}
+}Error:
+{
+"errors": [{
+"message": "Field StudentInput.name of required type String! was not provided."
+}]
+}✅ All required fields provided
+mutation {
+addStudent(input: {
+name: "Ravi Kumar"     ← Required ✓
+email: "ravi@example.com"  ← Required ✓
+rollNumber: "BCA001"   ← Required ✓
+departmentId: "101"    ← Required ✓
+}) {
+id
+}
+}
+</pre>
+</div>
+</div>            <h3>3. Custom Validation in Resolvers</h3>
+            <div class="example-box">
+                <h4>Business Logic Validation</h4>
+                <div class="code-block">
+<pre>
+const resolvers = {
+  Mutation: {
+    addStudent: async (parent, args) => {
+      const { input } = args;  // Validation 1: Check name length
+  if (input.name.length < 2) {
+    throw new Error('Name must be at least 2 characters long');
+  }  if (input.name.length > 100) {
+    throw new Error('Name cannot exceed 100 characters');
+  }  // Validation 2: Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(input.email)) {
+    throw new Error('Invalid email format');
+  }  // Validation 3: Check age range
+  if (input.age && (input.age < 17 || input.age > 30)) {
+    throw new Error('Age must be between 17 and 30');
+  }  // Validation 4: Check phone format
+  if (input.phone) {
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(input.phone)) {
+      throw new Error('Phone must be 10 digits');
+    }
+  }  // Validation 5: Check if email already exists
+  const existingStudent = await Student.findOne({ email: input.email });
+  if (existingStudent) {
+    throw new Error('Email already registered');
+  }  // Validation 6: Check if roll number already exists
+  const existingRoll = await Student.findOne({ rollNumber: input.rollNumber });
+  if (existingRoll) {
+    throw new Error('Roll number already exists');
+  }  // Validation 7: Check if department exists
+  const department = await Department.findById(input.departmentId);
+  if (!department) {
+    throw new Error('Department not found');
+  }  // All validations passed - create student
+  const student = new Student(input);
+  return await student.save();
+}
+}
+};
+</pre>
+</div>
+</div>            <h3>4. Custom Scalar Validation</h3>
+            <div class="example-box">
+                <h4>Email Scalar Type</h4>
+                <div class="code-block">
+<pre>
+const { GraphQLScalarType, GraphQLError } = require('graphql');// Custom Email scalar
+const EmailScalar = new GraphQLScalarType({
+name: 'Email',
+description: 'Email custom scalar type',// Validate when sending to client
+serialize(value) {
+if (!validateEmail(value)) {
+throw new GraphQLError('Invalid email format');
+}
+return value;
+},// Validate when receiving from client
+parseValue(value) {
+if (!validateEmail(value)) {
+throw new GraphQLError('Invalid email format');
+}
+return value;
+},// Validate literal values in queries
+parseLiteral(ast) {
+if (ast.kind !== 'StringValue') {
+throw new GraphQLError('Email must be a string');
+}
+if (!validateEmail(ast.value)) {
+throw new GraphQLError('Invalid email format');
+}
+return ast.value;
+}
+});function validateEmail(email) {
+const regex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
+return regex.test(email);
+}// Use in schema
+const typeDefs = `
+scalar Emailtype Student {
+id: ID!
+name: String!
+email: Email!    ← Custom Email type
+}
+`;const resolvers = {
+Email: EmailScalar,
+// ... other resolvers
+};
+</pre>
+</div>
+</div>            <h3>5. Using Validation Libraries</h3>
+            <div class="example-box">
+                <h4>Using Yup for Validation</h4>
+                <div class="code-block">
+<pre>
+const yup = require('yup');// Define validation schema
+const studentValidationSchema = yup.object().shape({
+name: yup.string()
+.min(2, 'Name must be at least 2 characters')
+.max(100, 'Name cannot exceed 100 characters')
+.required('Name is required'),email: yup.string()
+.email('Invalid email format')
+.required('Email is required'),rollNumber: yup.string()
+.matches(/^[A-Z]{3}[0-9]{3}$/, 'Roll number must be format: ABC123')
+.required('Roll number is required'),age: yup.number()
+.min(17, 'Age must be at least 17')
+.max(30, 'Age cannot exceed 30')
+.integer('Age must be a whole number')
+.nullable(),phone: yup.string()
+.matches(/^[0-9]{10}$/, 'Phone must be 10 digits')
+.nullable()
+});// Use in resolver
+const resolvers = {
+Mutation: {
+addStudent: async (parent, args) => {
+const { input } = args;  try {
+    // Validate input
+    await studentValidationSchema.validate(input, { abortEarly: false });    // Create student
+    const student = new Student(input);
+    return await student.save();  } catch (error) {
+    if (error.name === 'ValidationError') {
+      throw new Error(error.errors.join(', '));
+    }
+    throw error;
+  }
+}
+}
+};
+</pre>
+</div>
+</div>            <h3>Validation Error Examples</h3>
+            <div class="split-layout">
+                <div class="example-box">
+                    <h4>❌ Name Too Short</h4>
+                    <div class="code-block">
+<pre>
+mutation {
+  addStudent(input: {
+    name: "R"
+    email: "r@example.com"
+    rollNumber: "BCA001"
+    departmentId: "101"
+  }) {
+    id
+  }
+}Error:
+{
+"errors": [{
+"message": "Name must be at least 2 characters long"
+}]
+}
+</pre>
+</div>
+</div>                <div class="example-box">
+                    <h4>❌ Invalid Email</h4>
+                    <div class="code-block">
+<pre>
+mutation {
+  addStudent(input: {
+    name: "Ravi Kumar"
+    email: "invalid-email"
+    rollNumber: "BCA001"
+    departmentId: "101"
+  }) {
+    id
+  }
+}Error:
+{
+"errors": [{
+"message": "Invalid email format"
+}]
+}
+</pre>
+</div>
+</div>
+</div>            <div class="split-layout">
+                <div class="example-box">
+                    <h4>❌ Age Out of Range</h4>
+                    <div class="code-block">
+<pre>
+mutation {
+  addStudent(input: {
+    name: "Ravi Kumar"
+    email: "ravi@example.com"
+    rollNumber: "BCA001"
+    age: 35
+    departmentId: "101"
+  }) {
+    id
+  }
+}Error:
+{
+"errors": [{
+"message": "Age must be between 17 and 30"
+}]
+}
+</pre>
+</div>
+</div>                <div class="example-box">
+                    <h4>❌ Duplicate Email</h4>
+                    <div class="code-block">
+<pre>
+mutation {
+  addStudent(input: {
+    name: "Priya Sharma"
+    email: "ravi@example.com"
+    rollNumber: "BCA002"
+    departmentId: "101"
+  }) {
+    id
+  }
+}Error:
+{
+"errors": [{
+"message": "Email already registered"
+}]
+}
+</pre>
+</div>
+</div>
+</div>            <div class="success-box">
+                <h4>✅ Validation Best Practices</h4>
+                <ul>
+                    <li><strong>Layer validations:</strong> Schema + Resolver + Database</li>
+                    <li><strong>Clear error messages:</strong> Tell users exactly what's wrong</li>
+                    <li><strong>Validate early:</strong> Catch errors before database operations</li>
+                    <li><strong>Use libraries:</strong> Yup, Joi for complex validation</li>
+                    <li><strong>Custom scalars:</strong> For common patterns (Email, URL, Phone)</li>
+                    <li><strong>Sanitize input:</strong> Prevent injection attacks</li>
+                </ul>
+            </div>
+        </div>        <!-- 13. Error Handling -->
+        <div id="errors" class="section">
+            <h2>⚠️ Displaying Errors</h2>            <div class="concept-box">
+                <h4>How GraphQL Handles Errors</h4>
+                <p>GraphQL has a standardized way of returning errors. Errors appear in an <code>errors</code> array, and you might still get partial data!</p>
+            </div>            <h3>Error Response Structure</h3>
+            <div class="example-box">
+                <h4>GraphQL Error Format</h4>
+                <div class="code-block">
+<pre>
+{
+  "errors": [
+    {
+      "message": "Error description",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["fieldName"],
+      "extensions": {
+        "code": "ERROR_CODE",
+        "customField": "customValue"
+      }
+    }
+  ],
+  "data": {
+    "fieldName": null
+  }
+}Components:
+
+message: Human-readable error message
+locations: Where in the query the error occurred
+path: Which field caused the error
+extensions: Custom error data
+data: Partial data (if any)
+</pre>
+                  </div>
+              </div>
+
+            <h3>Types of Errors</h3>            <div class="step-card">
+                <span class="step-number">1</span>
+                <strong>Syntax Errors</strong>
+                <div class="code-block">
+<pre>
+# ❌ Missing closing brace
+query {
+  students {
+    name
+    email
+  # Missing }Error:
+{
+"errors": [{
+"message": "Syntax Error: Expected Name, found EOF",
+"locations": [{ "line": 5, "column": 1 }]
+}]
+}
+</pre>
+</div>
+</div>            <div class="step-card">
+                <span class="step-number">2</span>
+                <strong>Validation Errors</strong>
+                <div class="code-block">
+<pre>
+# ❌ Field doesn't exist
+query {
+  students {
+    name
+    emailAddress    ← Field doesn't exist (should be 'email')
+  }
+}Error:
+{
+"errors": [{
+"message": "Cannot query field "emailAddress" on type "Student".",
+"locations": [{ "line": 4, "column": 5 }]
+}]
+}
+</pre>
+</div>
+</div>            <div class="step-card">
+                <span class="step-number">3</span>
+                <strong>Type Errors</strong>
+                <div class="code-block">
+<pre>
+# ❌ Wrong type
+mutation {
+  addStudent(input: {
+    name: "Ravi"
+    email: "ravi@example.com"
+    rollNumber: 123        ← Number instead of String
+    departmentId: "101"
+  }) {
+    id
+  }
+}Error:
+{
+"errors": [{
+"message": "String cannot represent a non string value: 123",
+"locations": [{ "line": 5, "column": 18 }]
+}]
+}
+</pre>
+</div>
+</div>            <div class="step-card">
+                <span class="step-number">4</span>
+                <strong>Business Logic Errors</strong>
+                <div class="code-block">
+<pre>
+# ❌ Email already exists
+mutation {
+  addStudent(input: {
+    name: "Priya Sharma"
+    email: "ravi@example.com"    ← Already exists
+    rollNumber: "BCA002"
+    departmentId: "101"
+  }) {
+    id
+  }
+}Error:
+{
+"errors": [{
+"message": "Email already registered",
+"path": ["addStudent"],
+"extensions": {
+"code": "DUPLICATE_EMAIL"
+}
+}],
+"data": {
+"addStudent": null
+}
+}
+</pre>
+</div>
+</div>            <h3>Creating Custom Errors</h3>
+            <div class="example-box">
+                <h4>Custom Error Class</h4>
+                <div class="code-block">
+<pre>
+const { GraphQLError } = require('graphql');// Custom error classes
+class ValidationError extends GraphQLError {
+constructor(message, field) {
+super(message, {
+extensions: {
+code: 'VALIDATION_ERROR',
+field: field
+}
+});
+}
+}class NotFoundError extends GraphQLError {
+constructor(resource, id) {
+super(${resource} with ID ${id} not found, {
+extensions: {
+code: 'NOT_FOUND',
+resource: resource,
+id: id
+}
+});
+}
+}class DuplicateError extends GraphQLError {
+constructor(field, value) {
+super(${field} '${value}' already exists, {
+extensions: {
+code: 'DUPLICATE',
+field: field,
+value: value
+}
+});
+}
+}// Use in resolvers
+const resolvers = {
+Mutation: {
+addStudent: async (parent, args) => {
+const { input } = args;  // Validation error
+  if (input.name.length < 2) {
+    throw new ValidationError('Name must be at least 2 characters', 'name');
+  }  // Duplicate error
+  const existing = await Student.findOne({ email: input.email });
+  if (existing) {
+    throw new DuplicateError('email', input.email);
+  }  // Not found error
+  const department = await Department.findById(input.departmentId);
+  if (!department) {
+    throw new NotFoundError('Department', input.departmentId);
+  }  // Create student
+  const student = new Student(input);
+  return await student.save();
+}
+}
+};
+</pre>
+</div>
+</div>            <h3>Handling Errors on Client Side</h3>
+            <div class="example-box">
+                <h4>JavaScript/fetch() Error Handling</h4>
+                <div class="code-block">
+<pre>
+async function createStudent(studentData) {
+  const mutation = `
+    mutation AddStudent($input: StudentInput!) {
+      addStudent(input: $input) {
+        id
+        name
+        email
+      }
+    }
+  `;try {
+const response = await fetch('http://localhost:4000/graphql', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+},
+body: JSON.stringify({
+query: mutation,
+variables: { input: studentData }
+})
+});const result = await response.json();// Check for GraphQL errors
+if (result.errors) {
+  // Handle multiple errors
+  result.errors.forEach(error => {
+    console.error('GraphQL Error:', error.message);    // Check error code
+    if (error.extensions?.code === 'DUPLICATE_EMAIL') {
+      alert('This email is already registered!');
+    } else if (error.extensions?.code === 'VALIDATION_ERROR') {
+      alert(`Validation Error: ${error.message}`);
+    } else {
+      alert(`Error: ${error.message}`);
+    }
+  });
+  return null;
+}// Success
+return result.data.addStudent;} catch (error) {
+// Network or other errors
+console.error('Network Error:', error);
+alert('Failed to connect to server');
+return null;
+}
+}// Usage
+const newStudent = {
+name: 'Ravi Kumar',
+email: 'ravi@example.com',
+rollNumber: 'BCA001',
+departmentId: '101'
+};const result = await createStudent(newStudent);
+if (result) {
+console.log('Student created:', result);
+}
+</pre>
+</div>
+</div>            <div class="example-box">
+                <h4>React Component Error Handling</h4>
+                <div class="code-block">
+<pre>
+import React, { useState } from 'react';function AddStudentForm() {
+const [formData, setFormData] = useState({
+name: '',
+email: '',
+rollNumber: '',
+departmentId: ''
+});
+const [errors, setErrors] = useState([]);
+const [success, setSuccess] = useState(false);
+const [loading, setLoading] = useState(false);const handleSubmit = async (e) => {
+e.preventDefault();
+setLoading(true);
+setErrors([]);
+setSuccess(false);const mutation = `
+  mutation AddStudent($input: StudentInput!) {
+    addStudent(input: $input) {
+      id
+      name
+      email
+    }
+  }
+`;try {
+  const response = await fetch('http://localhost:4000/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: mutation,
+      variables: { input: formData }
+    })
+  });  const result = await response.json();  if (result.errors) {
+    // Set errors for display
+    setErrors(result.errors.map(err => ({
+      message: err.message,
+      code: err.extensions?.code,
+      field: err.extensions?.field
+    })));
+  } else {
+    setSuccess(true);
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      rollNumber: '',
+      departmentId: ''
+    });
+  }
+} catch (error) {
+  setErrors([{ message: 'Network error. Please try again.' }]);
+} finally {
+  setLoading(false);
+}
+};return (
+<div>
+<h2>Add Student</h2>  {/* Display errors */}
+  {errors.length > 0 && (
+    &lt;div style={{
+      background: '#ffebee',
+      border: '1px solid #f44336',
+      padding: '15px',
+      borderRadius: '5px',
+      marginBottom: '20px'
+    }}&gt;
+      &lt;h4 style={{ color: '#d32f2f', marginBottom: '10px' }}&gt;
+        ❌ Error{errors.length > 1 ? 's' : ''}
+      &lt;/h4&gt;
+      &lt;ul style={{ margin: 0, paddingLeft: '20px' }}&gt;
+        {errors.map((error, index) => (
+          &lt;li key={index} style={{ color: '#d32f2f' }}&gt;
+            {error.message}
+            {error.field && ` (Field: ${error.field})`}
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  )}  {/* Display success */}
+  {success && (
+    &lt;div style={{
+      background: '#e8f5e9',
+      border: '1px solid #4caf50',
+      padding: '15px',
+      borderRadius: '5px',
+      marginBottom: '20px'
+    }}&gt;
+      &lt;p style={{ color: '#2e7d32', margin: 0 }}&gt;
+        ✅ Student created successfully!
+      &lt;/p&gt;
+    &lt;/div&gt;
+  )}  &lt;form onSubmit={handleSubmit}&gt;
+    {/* Form fields... */}    &lt;button type="submit" disabled={loading}&gt;
+      {loading ? 'Creating...' : 'Add Student'}
+    &lt;/button&gt;
+  &lt;/form&gt;
+&lt;/div&gt;
+);
+}export default AddStudentForm;
+</pre>
+</div>
+</div>            <div class="example-box">
+                <h4>Apollo Client Error Handling</h4>
+                <div class="code-block">
+<pre>
+import { useMutation, gql } from '@apollo/client';const ADD_STUDENT = gql  mutation AddStudent($input: StudentInput!) {     addStudent(input: $input) {       id       name       email     }   };function AddStudentForm() {
+const [addStudent, { data, loading, error }] = useMutation(ADD_STUDENT, {
+onError: (error) => {
+// Handle GraphQL errors
+if (error.graphQLErrors) {
+error.graphQLErrors.forEach(({ message, extensions }) => {
+if (extensions?.code === 'DUPLICATE_EMAIL') {
+alert('Email already exists!');
+} else {
+alert(Error: ${message});
+}
+});
+}  // Handle network errors
+  if (error.networkError) {
+    alert('Network error. Please check your connection.');
+  }
+},
+onCompleted: (data) => {
+  alert(`Student ${data.addStudent.name} created successfully!`);
+}
+});const handleSubmit = (formData) => {
+addStudent({
+variables: { input: formData }
+});
+};return (
+<div>
+{/* Display error message */}
+{error && (
+<div style={{ color: 'red' }}>
+{error.message}
+</div>
+)}  {/* Form... */}
+&lt;/div&gt;
+);
+}
+</pre>
+</div>
+</div>            <div class="success-box">
+                <h4>✅ Error Handling Best Practices</h4>
+                <ul>
+                    <li><strong>Clear messages:</strong> Explain what went wrong</li>
+                    <li><strong>Error codes:</strong> Use codes for programmatic handling</li>
+                    <li><strong>Field-specific:</strong> Tell which field has the error</li>
+                    <li><strong>User-friendly:</strong> Technical details for devs, simple messages for users</li>
+                    <li><strong>Log errors:</strong> Server-side logging for debugging</li>
+                    <li><strong>Don't expose internals:</strong> Hide database errors from users</li>
+                </ul>
+            </div>
+        </div>    </div>    <!-- Footer -->
+    <div class="footer">
+        <h3>🎓 You've Completed GraphQL Fundamentals!</h3>
+        <p style="margin: 20px 0;">You now understand all the core concepts of GraphQL</p>        <div style="margin: 30px 0;">
+            <h4>📚 Further Learning:</h4>
+            <p><strong>Official Docs:</strong> <a href="https://graphql.org/learn" target="_blank">graphql.org/learn</a></p>
+            <p><strong>Apollo Docs:</strong> <a href="https://apollographql.com/docs" target="_blank">apollographql.com/docs</a></p>
+            <p><strong>GraphQL Code Generator:</strong> <a href="https://www.graphql-code-generator.com" target="_blank">graphql-code-generator.com</a></p>
+        </div>        <p style="font-size: 0.9em; opacity: 0.8; margin-top: 30px;">
+            Created for BCA Students | Swarnandhra College of Engineering & Technology
+        </p>
+        <p style="font-size: 0.9em; opacity: 0.8;">
+            © 2024 - Educational Use Only
+        </p>
+    </div>
+</div><script>
+    // Show section function
+    function showSection(sectionId) {
+        // Hide all sections
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('active');
+        });        // Remove active class from all buttons
+        const buttons = document.querySelectorAll('.nav-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });        // Show selected section
+        document.getElementById(sectionId).classList.add('active');        // Add active class to clicked button
+        event.target.classList.add('active');        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + Number to switch sections
+        if ((e.ctrlKey || e.metaKey) && e.key >= '1' && e.key <= '9') {
+            e.preventDefault();
+            const sections = [
+                'intro', 'field-spec', 'graph-based', 'single-endpoint',
+                'strongly-typed', 'introspection', 'libraries', 'schema',
+                'list-api', 'create-api', 'variables', 'validations', 'errors'
+            ];
+            const index = parseInt(e.key) - 1;
+            if (sections[index]) {
+                showSection(sections[index]);
+            }
+        }
+    });    // Print current section info
+    console.log('%c GraphQL Fundamentals Tutorial ', 'background: #667eea; color: white; font-size: 20px; padding: 10px;');
+    console.log('%c Navigate using the top menu or keyboard shortcuts (Ctrl+1 to Ctrl+9)', 'color: #764ba2; font-size: 14px;');
+</script>
+</body>
+</html>
